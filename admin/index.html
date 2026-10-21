@@ -82,6 +82,10 @@ a{color:#175bd2}
 <textarea id="adDescription" maxlength="500" required></textarea>
 <label>Destination URL</label>
 <input id="adUrl" type="url" required placeholder="https://example.com">
+<label>Offer image (optional — JPG, PNG or WebP, up to 5 MB)</label>
+<input id="adImage" type="file" accept="image/jpeg,image/png,image/webp">
+<p><small>Images are stored in Cloudflare R2. Configure the OFFERS_BUCKET binding before uploading.</small></p>
+<div id="adImageCurrent"></div>
 <label>Button label</label>
 <input id="adCta" maxlength="40" value="Learn more" required>
 <label>Status</label>
@@ -112,10 +116,11 @@ async function api(path,options={}){
  const response=await fetch('/api/'+path,{
   credentials:'same-origin',
   cache:'no-store',
+  signal:AbortSignal.timeout(12000),
   ...options
  });
  const data=await response.json().catch(()=>({}));
- if(!response.ok)throw new Error(data.error||'Request failed: '+response.status);
+ if(!response.ok)throw new Error((data.error||'Request failed: '+response.status)+(data.diagnostic?' ['+data.diagnostic+']':''));
  return data;
 }
 async function loadPosts(){
@@ -133,7 +138,7 @@ async function loadPosts(){
   message('Administrator access verified.');
  }catch(error){
   authorised=false;
-  message('Administrator access problem: '+error.message);
+  message('Administrator access problem: '+(error.name==='TimeoutError'?'Server did not respond within 12 seconds. Check Preview bindings and redeploy.':error.message));
  }
 }
 function editPost(i){
@@ -207,14 +212,16 @@ function editAd(i){
  $('adDescription').value=a.description||'';
  $('adUrl').value=a.url||'';
  $('adCta').value=a.cta||'Learn more';
+ $('adImage').value='';
+ $('adImageCurrent').textContent=a.image_url?'Current picture saved. Choose a file to replace it.':'No picture uploaded.';
  $('adStatus').value=a.status||'draft';
  $('adForm').scrollIntoView({behavior:'smooth'});
 }
-function resetAd(){$('adForm').reset();$('adId').value=''}
+function resetAd(){$('adForm').reset();$('adId').value='';$('adImageCurrent').textContent=''}
 $('adForm').onsubmit=async e=>{
  e.preventDefault();
  try{
-  await api('admin/ads',{
+  const savedOffer=await api('admin/ads',{
    method:'POST',
    headers:{'content-type':'application/json'},
    body:JSON.stringify({
@@ -226,6 +233,13 @@ $('adForm').onsubmit=async e=>{
     status:$('adStatus').value
    })
   });
+  const selectedImage=$('adImage').files[0];
+  if(selectedImage){
+   if(!['image/jpeg','image/png','image/webp'].includes(selectedImage.type)||selectedImage.size>5*1024*1024)throw new Error('Choose a JPG, PNG or WebP image under 5 MB.');
+   const saved=savedOffer;
+   const form=new FormData();form.append('image',selectedImage);
+   await api('admin/ads/image/'+saved.id,{method:'POST',body:form});
+  }
   resetAd();await loadAds();alert('Advertisement saved.');
  }catch(error){alert(error.message)}
 };

@@ -1,0 +1,1 @@
+-- Run once against the existing production D1 database before enabling image uploads.\nALTER TABLE personal_ads ADD COLUMN image_url TEXT NOT NULL DEFAULT '';\n

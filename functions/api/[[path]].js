@@ -214,6 +214,7 @@ export async function onRequest({ request, env, params }) {
   const homeDefaults={eyebrow:"IDEAS WORTH EXPLORING",title:"Understand the world. Stay ahead of what\u0027s next.",description:"Clear thinking on technology, artificial intelligence, science, digital skills and the ideas shaping our future.",button:"Explore articles →"};
   if(path==="site-content"&&method==="GET"){const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("homepage").first();let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}return json({...homeDefaults,...saved})}
 
+  if(path==="videos"&&method==="GET"){const {results}=await env.DB.prepare("SELECT youtube_id,title,description,category,url,cta,sponsored FROM media_videos WHERE status='published' ORDER BY updated_at DESC LIMIT 100").all();return json({videos:results.map(v=>({youtubeId:v.youtube_id,title:v.title,description:v.description,category:v.category,url:v.url,cta:v.cta,sponsored:!!v.sponsored}))})}
   // PUBLIC ARTICLES
   if (path === "posts" && method === "GET") {
     const { results } = await env.DB.prepare(
@@ -257,6 +258,13 @@ export async function onRequest({ request, env, params }) {
   if(path==="admin/site-content"&&method==="GET"){const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("homepage").first();let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}return json({...homeDefaults,...saved})}
   if(path==="admin/site-content"&&method==="POST"){const d=await bodyJson(request);if(!d||typeof d!=="object")return json({error:"Invalid request"},400);const limits={eyebrow:80,title:180,description:500,button:60},saved={};for(const [key,max] of Object.entries(limits)){if(typeof d[key]!=="string"||!d[key].trim()||d[key].trim().length>max)return json({error:"Invalid "+key+" text"},400);saved[key]=d[key].trim()}await env.DB.prepare("INSERT INTO site_settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").bind("homepage",JSON.stringify(saved)).run();return json({ok:true})}
 
+  if(path==="admin/videos"&&method==="GET"){const {results}=await env.DB.prepare("SELECT * FROM media_videos ORDER BY updated_at DESC LIMIT 200").all();return json({videos:results})}
+  if(path==="admin/videos"&&method==="POST"){const d=await bodyJson(request);if(!d||typeof d!=="object")return json({error:"Invalid JSON"},400);
+    let youtubeId="";try{const u=new URL(String(d.youtube_url||""));const host=u.hostname.toLowerCase();if(["youtube.com","www.youtube.com","m.youtube.com","youtube-nocookie.com","www.youtube-nocookie.com"].includes(host)){youtubeId=u.searchParams.get("v")||(u.pathname.match(/^\/(?:shorts|embed|live)\/([A-Za-z0-9_-]{11})/)||[])[1]||""}else if(host==="youtu.be"||host==="www.youtu.be"){youtubeId=u.pathname.split("/")[1]||""}}catch{}
+    const title=String(d.title||"").trim(),description=String(d.description||"").trim(),category=String(d.category||"").trim(),url=String(d.url||"").trim(),cta=String(d.cta||"Learn more").trim();
+    if(!/^[A-Za-z0-9_-]{11}$/.test(youtubeId)||!title||title.length>160||description.length>600||!["Digital Products","Education","Business","Technology","Entertainment"].includes(category)||url.length>1000||(url&&!/^https:\/\/[^\s]+$/i.test(url))||!cta||cta.length>40)return json({error:"Check YouTube URL, title, description, category and HTTPS link."},400);
+    const id=validId(d.id)?d.id:crypto.randomUUID();await env.DB.prepare("INSERT INTO media_videos (id,youtube_id,title,description,category,url,cta,sponsored,status) VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET youtube_id=excluded.youtube_id,title=excluded.title,description=excluded.description,category=excluded.category,url=excluded.url,cta=excluded.cta,sponsored=excluded.sponsored,status=excluded.status,updated_at=datetime('now')").bind(id,youtubeId,title,description,category,url,cta,d.sponsored===true?1:0,d.status==="published"?"published":"draft").run();return json({ok:true,id})}
+  if(path==="admin/videos/delete"&&method==="POST"){const d=await bodyJson(request);if(!d||!validId(d.id))return json({error:"Invalid ID"},400);await env.DB.prepare("DELETE FROM media_videos WHERE id=?").bind(d.id).run();return json({ok:true})}
   // ADMIN: UPLOAD OFFER IMAGE
   if(path.startsWith('admin/ads/image/')&&method==='POST'){
     const id=path.slice('admin/ads/image/'.length);

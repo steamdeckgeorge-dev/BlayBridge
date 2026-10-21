@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS media_videos (id TEXT PRIMARY KEY, youtube_id TEXT NOT NULL, title TEXT NOT NULL, description TEXT NOT NULL DEFAULT '', category TEXT NOT NULL, url TEXT NOT NULL DEFAULT '', cta TEXT NOT NULL DEFAULT 'Learn more', sponsored INTEGER NOT NULL DEFAULT 0, status TEXT NOT NULL DEFAULT 'draft', updated_at TEXT NOT NULL DEFAULT (datetime('now')));

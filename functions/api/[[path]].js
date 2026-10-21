@@ -211,6 +211,9 @@ export async function onRequest({ request, env, params }) {
   const path = (params.path || []).join("/");
   const method = request.method;
 
+  const homeDefaults={eyebrow:"IDEAS WORTH EXPLORING",title:"Understand the world. Stay ahead of what\u0027s next.",description:"Clear thinking on technology, artificial intelligence, science, digital skills and the ideas shaping our future.",button:"Explore articles →"};
+  if(path==="site-content"&&method==="GET"){const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("homepage").first();let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}return json({...homeDefaults,...saved})}
+
   // PUBLIC ARTICLES
   if (path === "posts" && method === "GET") {
     const { results } = await env.DB.prepare(
@@ -250,6 +253,9 @@ export async function onRequest({ request, env, params }) {
       ...failure
     }, 401);
   }
+
+  if(path==="admin/site-content"&&method==="GET"){const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("homepage").first();let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}return json({...homeDefaults,...saved})}
+  if(path==="admin/site-content"&&method==="POST"){const d=await bodyJson(request);if(!d||typeof d!=="object")return json({error:"Invalid request"},400);const limits={eyebrow:80,title:180,description:500,button:60},saved={};for(const [key,max] of Object.entries(limits)){if(typeof d[key]!=="string"||!d[key].trim()||d[key].trim().length>max)return json({error:"Invalid "+key+" text"},400);saved[key]=d[key].trim()}await env.DB.prepare("INSERT INTO site_settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").bind("homepage",JSON.stringify(saved)).run();return json({ok:true})}
 
   // ADMIN: UPLOAD OFFER IMAGE
   if(path.startsWith('admin/ads/image/')&&method==='POST'){

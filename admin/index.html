@@ -116,10 +116,11 @@ async function api(path,options={}){
  const response=await fetch('/api/'+path,{
   credentials:'same-origin',
   cache:'no-store',
+  signal:AbortSignal.timeout(12000),
   ...options
  });
  const data=await response.json().catch(()=>({}));
- if(!response.ok)throw new Error(data.error||'Request failed: '+response.status);
+ if(!response.ok)throw new Error((data.error||'Request failed: '+response.status)+(data.diagnostic?' ['+data.diagnostic+']':''));
  return data;
 }
 async function loadPosts(){
@@ -137,7 +138,7 @@ async function loadPosts(){
   message('Administrator access verified.');
  }catch(error){
   authorised=false;
-  message('Administrator access problem: '+error.message);
+  message('Administrator access problem: '+(error.name==='TimeoutError'?'Server did not respond within 12 seconds. Check Preview bindings and redeploy.':error.message));
  }
 }
 function editPost(i){

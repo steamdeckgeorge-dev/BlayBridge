@@ -82,7 +82,7 @@ a{color:#175bd2}
 <textarea id="adDescription" maxlength="500" required></textarea>
 <label>Destination URL</label>
 <input id="adUrl" type="url" required placeholder="https://example.com">
-<label>Button label</label>
+<label>Offer image (optional — JPG, PNG or WebP, up to 5 MB)</label>\n<input id="adImage" type="file" accept="image/jpeg,image/png,image/webp">\n<p><small>Images are stored in Cloudflare R2. Configure the OFFERS_BUCKET binding before uploading.</small></p>\n<div id="adImageCurrent"></div>\n<label>Button label</label>
 <input id="adCta" maxlength="40" value="Learn more" required>
 <label>Status</label>
 <select id="adStatus">
@@ -206,11 +206,11 @@ function editAd(i){
  $('adTitle').value=a.title||'';
  $('adDescription').value=a.description||'';
  $('adUrl').value=a.url||'';
- $('adCta').value=a.cta||'Learn more';
+ $('adCta').value=a.cta||'Learn more';\n $('adImage').value='';\n $('adImageCurrent').textContent=a.image_url?'Current picture saved. Choose a file to replace it.':'No picture uploaded.';
  $('adStatus').value=a.status||'draft';
  $('adForm').scrollIntoView({behavior:'smooth'});
 }
-function resetAd(){$('adForm').reset();$('adId').value=''}
+function resetAd(){$('adForm').reset();$('adId').value='';$('adImageCurrent').textContent=''}
 $('adForm').onsubmit=async e=>{
  e.preventDefault();
  try{
@@ -226,7 +226,7 @@ $('adForm').onsubmit=async e=>{
     status:$('adStatus').value
    })
   });
-  resetAd();await loadAds();alert('Advertisement saved.');
+  window.__lastSavedOffer=savedOffer;\n  const selectedImage=$('adImage').files[0];\n  if(selectedImage){\n   if(!['image/jpeg','image/png','image/webp'].includes(selectedImage.type)||selectedImage.size>5*1024*1024)throw new Error('Choose a JPG, PNG or WebP image under 5 MB.');\n   const saved=window.__lastSavedOffer;\n   const form=new FormData();form.append('image',selectedImage);\n   await api('admin/ads/image/'+saved.id,{method:'POST',body:form});\n  }\n  resetAd();await loadAds();alert('Advertisement saved.');
  }catch(error){alert(error.message)}
 };
 async function deleteAd(i){

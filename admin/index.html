@@ -34,6 +34,7 @@ a{color:#175bd2}
 <main>
 <div id="status" class="notice">Checking administrator access...</div>
 
+<section><h2>Homepage wording</h2><p><small>Change the text at the top of the public homepage.</small></p><form id="homepageForm"><label>Small heading</label><input id="homeEyebrow" maxlength="80" required><label>Main heading</label><textarea id="homeTitle" maxlength="180" required></textarea><label>Description</label><textarea id="homeDescription" maxlength="500" required></textarea><label>Button text</label><input id="homeButton" maxlength="60" required><button type="submit">Save homepage wording</button></form></section>
 <section>
 <h2>Articles</h2>
 <button onclick="loadPosts()">Refresh articles</button>
@@ -254,9 +255,11 @@ async function deleteAd(i){
   await loadAds();
  }catch(error){alert(error.message)}
 }
+async function loadHomepage(){try{const d=await api("admin/site-content");$("homeEyebrow").value=d.eyebrow||"";$("homeTitle").value=d.title||"";$("homeDescription").value=d.description||"";$("homeButton").value=d.button||""}catch(error){message("Could not load homepage wording: "+error.message)}}
+$("homepageForm").onsubmit=async e=>{e.preventDefault();try{await api("admin/site-content",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({eyebrow:$("homeEyebrow").value,title:$("homeTitle").value,description:$("homeDescription").value,button:$("homeButton").value})});alert("Homepage wording saved. Refresh the homepage to see it.")}catch(error){alert(error.message)}};
 async function start(){
  await loadPosts();
- if(authorised)await loadAds();
+ if(authorised){await loadAds();await loadHomepage();}
 }
 start();
 </script>

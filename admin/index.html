@@ -35,7 +35,7 @@ a{color:#175bd2}
 <div id="status" class="notice">Checking administrator access...</div>
 
 <section><h2>Homepage wording</h2><p><small>Change the text at the top of the public homepage.</small></p><form id="homepageForm"><label>Small heading</label><input id="homeEyebrow" maxlength="80" required><label>Main heading</label><textarea id="homeTitle" maxlength="180" required></textarea><label>Description</label><textarea id="homeDescription" maxlength="500" required></textarea><label>Button text</label><input id="homeButton" maxlength="60" required><button type="submit">Save homepage wording</button></form></section>
-<section>
+<section><h2>Manage Videos · BlayBridge Media</h2><p><small>Paste a YouTube video link to feature it on the Media page. Published videos are visible to everyone.</small></p><div id="videosAdmin"></div><form id="videoForm"><input type="hidden" id="videoId"><label>YouTube video URL</label><input id="videoUrl" type="url" required placeholder="https://www.youtube.com/watch?v=..."><label>Video title</label><input id="videoTitle" maxlength="160" required><label>Description</label><textarea id="videoDescription" maxlength="600"></textarea><label>Category</label><select id="videoCategory"><option>Digital Products</option><option>Education</option><option>Business</option><option>Technology</option><option>Entertainment</option></select><label>Product or business link (optional, HTTPS)</label><input id="videoLink" type="url" placeholder="https://example.com"><label>Link button text</label><input id="videoCta" maxlength="40" value="Learn more"><label>Sponsored content?</label><select id="videoSponsored"><option value="no">No</option><option value="yes">Yes — sponsored promotion</option></select><label>Status</label><select id="videoStatus"><option value="draft">Draft</option><option value="published">Published</option></select><button type="submit">Save video</button><button type="button" class="secondary" onclick="resetVideo()">Clear form</button></form></section><section>
 <h2>Articles</h2>
 <button onclick="loadPosts()">Refresh articles</button>
 <button onclick="importDrafts()">Import source-linked drafts</button>
@@ -257,9 +257,15 @@ async function deleteAd(i){
 }
 async function loadHomepage(){try{const d=await api("admin/site-content");$("homeEyebrow").value=d.eyebrow||"";$("homeTitle").value=d.title||"";$("homeDescription").value=d.description||"";$("homeButton").value=d.button||""}catch(error){message("Could not load homepage wording: "+error.message)}}
 $("homepageForm").onsubmit=async e=>{e.preventDefault();try{await api("admin/site-content",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({eyebrow:$("homeEyebrow").value,title:$("homeTitle").value,description:$("homeDescription").value,button:$("homeButton").value})});alert("Homepage wording saved. Refresh the homepage to see it.")}catch(error){alert(error.message)}};
+let videos=[];
+async function loadVideos(){try{const d=await api('admin/videos');videos=d.videos||[];$('videosAdmin').innerHTML=videos.length?videos.map((v,i)=>'<div class="item"><strong>'+escapeHTML(v.title)+'</strong><p><small>'+escapeHTML(v.category)+' · '+escapeHTML(v.status)+'</small></p><button onclick="editVideo('+i+')">Edit</button><button class="danger" onclick="deleteVideo('+i+')">Delete</button></div>').join(''):'<p>No videos yet.</p>'}catch(e){$('videosAdmin').textContent='Could not load videos: '+e.message}}
+function editVideo(i){const v=videos[i];$('videoId').value=v.id;$('videoUrl').value='https://www.youtube.com/watch?v='+v.youtube_id;$('videoTitle').value=v.title;$('videoDescription').value=v.description||'';$('videoCategory').value=v.category;$('videoLink').value=v.url||'';$('videoCta').value=v.cta||'Learn more';$('videoSponsored').value=v.sponsored?'yes':'no';$('videoStatus').value=v.status;$('videoForm').scrollIntoView({behavior:'smooth'})}
+function resetVideo(){$('videoForm').reset();$('videoId').value=''}
+$('videoForm').onsubmit=async e=>{e.preventDefault();try{await api('admin/videos',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id:$('videoId').value||undefined,youtube_url:$('videoUrl').value,title:$('videoTitle').value,description:$('videoDescription').value,category:$('videoCategory').value,url:$('videoLink').value,cta:$('videoCta').value,sponsored:$('videoSponsored').value==='yes',status:$('videoStatus').value})});resetVideo();await loadVideos();alert('Video saved. Published videos appear on BlayBridge Media.')}catch(error){alert(error.message)}};
+async function deleteVideo(i){if(!confirm('Delete this video listing?'))return;try{await api('admin/videos/delete',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id:videos[i].id})});await loadVideos()}catch(e){alert(e.message)}}
 async function start(){
  await loadPosts();
- if(authorised){await loadAds();await loadHomepage();}
+ if(authorised){await loadAds();await loadHomepage();await loadVideos();}
 }
 start();
 </script>

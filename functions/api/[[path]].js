@@ -223,13 +223,13 @@ export async function onRequest({ request, env, params }) {
   // PUBLIC ADVERTISEMENTS
   if (path === "ads" && method === "GET") {
     const { results } = await env.DB.prepare(
-      "SELECT id,title,description,url,cta FROM personal_ads WHERE status='published' ORDER BY updated_at DESC LIMIT 12"
+      "SELECT id,title,description,url,cta,image_url FROM personal_ads WHERE status='published' ORDER BY updated_at DESC LIMIT 12"
     ).all();
 
     return json({ ads: results });
   }
 
-  // ADMIN AUTHENTICATION
+  // PUBLIC OFFER IMAGES (only published offers)\n  if (path.startsWith('offer-image/') && method === 'GET') {\n    const id=path.slice('offer-image/'.length);\n    if(!validId(id))return json({error:'Not found'},404);\n    const row=await env.DB.prepare(\"SELECT image_url FROM personal_ads WHERE id=? AND status='published'\").bind(id).first();\n    if(!row||row.image_url!==('/api/offer-image/'+id)||!env.OFFERS_BUCKET)return json({error:'Not found'},404);\n    const object=await env.OFFERS_BUCKET.get('offers/'+id);\n    if(!object)return json({error:'Not found'},404);\n    const type=object.httpMetadata?.contentType||'application/octet-stream';\n    return new Response(object.body,{headers:{'content-type':type,'cache-control':'public, max-age=300','x-content-type-options':'nosniff','content-security-policy':\"default-src 'none'; sandbox\"}});\n  }\n\n  // ADMIN AUTHENTICATION
   const failure = await checkAccess(request, env);
 
   if (failure) {
@@ -239,7 +239,7 @@ export async function onRequest({ request, env, params }) {
     }, 401);
   }
 
-  // ADMIN: LIST ADS
+  // ADMIN: UPLOAD OFFER IMAGE\n  if(path.startsWith('admin/ads/image/')&&method==='POST'){\n    const id=path.slice('admin/ads/image/'.length);\n    if(!validId(id))return json({error:'Invalid offer ID'},400);\n    if(!env.OFFERS_BUCKET)return json({error:'Image storage not configured: add OFFERS_BUCKET R2 binding'},503);\n    const offer=await env.DB.prepare('SELECT id FROM personal_ads WHERE id=?').bind(id).first();\n    if(!offer)return json({error:'Offer not found'},404);\n    let form;try{form=await request.formData()}catch{return json({error:'Invalid image upload'},400)}\n    const file=form.get('image');\n    if(!file||typeof file.arrayBuffer!=='function'||file.size===0||file.size>5*1024*1024||!['image/jpeg','image/png','image/webp'].includes(file.type))return json({error:'Choose a JPG, PNG or WebP image under 5 MB'},400);\n    const bytes=await file.arrayBuffer();\n    const sig=new Uint8Array(bytes.slice(0,12));\n    const jpg=sig[0]===255&&sig[1]===216&&sig[2]===255;\n    const png=sig[0]===137&&sig[1]===80&&sig[2]===78&&sig[3]===71&&sig[4]===13&&sig[5]===10&&sig[6]===26&&sig[7]===10;\n    const webp=String.fromCharCode(...sig.slice(0,4))==='RIFF'&&String.fromCharCode(...sig.slice(8,12))==='WEBP';\n    if(!((file.type==='image/jpeg'&&jpg)||(file.type==='image/png'&&png)||(file.type==='image/webp'&&webp)))return json({error:'Invalid image file'},400);\n    await env.OFFERS_BUCKET.put('offers/'+id,bytes,{httpMetadata:{contentType:file.type}});\n    const image_url='/api/offer-image/'+id;\n    await env.DB.prepare('UPDATE personal_ads SET image_url=?,updated_at=datetime(\'now\') WHERE id=?').bind(image_url,id).run();\n    return json({ok:true,image_url});\n  }\n\n  // ADMIN: LIST ADS
   if (path === "admin/ads" && method === "GET") {
     const { results } = await env.DB.prepare(
       "SELECT * FROM personal_ads ORDER BY updated_at DESC LIMIT 100"

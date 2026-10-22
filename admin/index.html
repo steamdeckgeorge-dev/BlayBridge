@@ -255,9 +255,9 @@ function saveEditorSelection(){
  floatingToolbar=popup;
  const rect=range.getBoundingClientRect();
  const width=popup.offsetWidth;
- const left=rect.right+width+12<window.innerWidth?rect.right+8:Math.max(8,rect.left-width-8);
+ const left=Math.max(8,Math.min(rect.left+(rect.width-width)/2,window.innerWidth-width-8));
  const height=popup.offsetHeight;
- const top=Math.max(8,Math.min(rect.top,window.innerHeight-height-8));
+ const top=rect.bottom+height+10<window.innerHeight?rect.bottom+8:Math.max(8,rect.top-height-8);
  popup.style.left=left+'px';popup.style.top=Math.max(8,top)+'px';
  return true;
 }

@@ -31,7 +31,7 @@
 </div>
 <div class="invoiceItemsHeader"><strong>Invoice items</strong><button type="button" id="invAddItem">+ Add item</button></div>
 <div id="invItems"></div>
-<div class="invoiceFormGrid"><label>Tax type<input id="invTaxType" maxlength="60" placeholder="e.g. VAT, GST, Sales Tax"></label><label>Tax rate (%)<input id="invTax" type="number" min="0" max="100" step=".01" placeholder="Optional tax percentage"></label><label>Discount (fixed amount)<input id="invDiscount" type="number" min="0" step=".01" value="0"></label></div>
+<div class="invoiceFormGrid"><label>Tax type<input id="invTaxType" maxlength="60" placeholder="e.g. VAT, GST, Sales Tax"></label><label>Tax rate (%)<input id="invTax" type="number" min="0" max="100" step=".01" placeholder="Optional tax percentage"></label><label>Discount type<select id="invDiscountType"><option value="fixed">Fixed amount</option><option value="percent">Percentage (%)</option></select></label><label>Discount<input id="invDiscount" type="number" min="0" step=".01" placeholder="Optional discount"></label></div>
 <label>Approval note (optional)<textarea id="invApprovalNote" placeholder="e.g. Submitted for HR approval. No payment is required until approved."></textarea></label>
 <label>Notes and payment instructions<textarea id="invNotes" placeholder="Payment details, terms or a thank-you note"></textarea></label>
 <div class="output" id="invTotals" aria-live="polite"></div>
@@ -67,7 +67,7 @@ $('invLogo').addEventListener('change',()=>{
  reader.readAsDataURL(file);
 });
 $('invRemoveLogo').onclick=()=>{invLogoData='';$('invLogo').value='';$('invLogoStatus').textContent='No logo selected.';invUpdate()};
-const invFields=['invBusiness','invBusinessContact','invCustomer','invCustomerContact','invNumber','invDate','invDue','invDocType','invReference','invValidUntil','invApprovalNote','invCurrency','invTaxType','invTax','invDiscount','invNotes'];
+const invFields=['invBusiness','invBusinessContact','invCustomer','invCustomerContact','invNumber','invDate','invDue','invDocType','invReference','invValidUntil','invApprovalNote','invCurrency','invTaxType','invTax','invDiscountType','invDiscount','invNotes'];
 $('invDate').value=new Date().toISOString().slice(0,10);
 function invAddItem(description='',amount=''){
  const row=document.createElement('div');row.className='invoiceItem';
@@ -83,7 +83,10 @@ function invUpdate(){
  const rows=[...document.querySelectorAll('.invoiceItem')].map(el=>({description:el.querySelector('.invDescription').value.trim(),rawAmount:el.querySelector('.invAmount').value,amount:invNum(el.querySelector('.invAmount').value)})).filter(item=>item.description||item.rawAmount.trim());
  const subtotal=rows.reduce((sum,item)=>sum+item.amount,0);
  const hasDiscount=$('invDiscount').value.trim()!==''&&invNum($('invDiscount').value)>0;
- const discount=hasDiscount?Math.min(subtotal,invNum($('invDiscount').value)):0;
+ const discountType=$('invDiscountType').value;
+ const discountInput=invNum($('invDiscount').value);
+ const discount=hasDiscount?Math.min(subtotal,discountType==='percent'?subtotal*Math.min(100,discountInput)/100:discountInput):0;
+ const discountLabel=discountType==='percent'?'Discount ('+Math.min(100,discountInput)+'%)':'Discount';
  const hasTax=$('invTax').value.trim()!==''&&invNum($('invTax').value)>0;
  const taxRate=Math.min(100,invNum($('invTax').value));
  const tax=hasTax?(subtotal-discount)*taxRate/100:0;
@@ -94,19 +97,20 @@ function invUpdate(){
  const reference=$('invReference').value.trim(),validUntil=$('invValidUntil').value;
  const approval=$('invApprovalNote').value.trim(),notes=$('invNotes').value.trim();
  const hasFinancials=rows.some(item=>item.rawAmount.trim()!=='')||hasTax||hasDiscount;
- $('invTotals').textContent=hasFinancials?['Subtotal: '+money(subtotal),hasDiscount?'Discount: '+money(discount):'',hasTax?($('invTaxType').value.trim()||'Tax')+': '+money(tax):'','Total: '+money(total)].filter(Boolean).join(' | '):'';
+ $('invTotals').textContent=hasFinancials?['Subtotal: '+money(subtotal),hasDiscount?discountLabel+': '+money(discount):'',hasTax?($('invTaxType').value.trim()||'Tax')+': '+money(tax):'','Total: '+money(total)].filter(Boolean).join(' | '):'';
  const metadata=[ $('invNumber').value.trim()?'<strong>'+cell($('invNumber').value.trim())+'</strong>':'',
  $('invDate').value?'Issued: '+cell($('invDate').value):'',
  $('invDue').value?'Due: '+cell($('invDue').value):'',
  reference?'Reference: '+cell(reference):'',
  validUntil?'Valid until: '+cell(validUntil):'' ].filter(Boolean).join('<br>');
  const itemTable=rows.length?'<table><thead><tr><th>Description</th><th class="num">Amount</th></tr></thead><tbody>'+rows.map(item=>'<tr><td>'+cell(item.description)+'</td><td class="num">'+(item.rawAmount.trim()?money(item.amount):'')+'</td></tr>').join('')+'</tbody></table>':'';
- const totals=hasFinancials?'<p style="text-align:right">Subtotal: '+money(subtotal)+(hasDiscount?'<br>Discount: −'+money(discount):'')+(hasTax?'<br>'+cell($('invTaxType').value.trim()||'Tax')+' ('+taxRate+'%): '+money(tax):'')+'</p><h3 style="text-align:right">Total: '+money(total)+'</h3>':'';
+ const totals=hasFinancials?'<p style="text-align:right">Subtotal: '+money(subtotal)+(hasDiscount?'<br>'+discountLabel+': −'+money(discount):'')+(hasTax?'<br>'+cell($('invTaxType').value.trim()||'Tax')+' ('+taxRate+'%): '+money(tax):'')+'</p><h3 style="text-align:right">Total: '+money(total)+'</h3>':'';
  $('invPreview').innerHTML='<div class="invoiceHead"><div>'+(invLogoData?'<img src="'+invLogoData+'" alt="Company logo" class="invoiceLogo">':'')+'<h2>'+cell(docType)+'</h2>'+(business?'<strong>'+cell(business)+'</strong>':'')+detail('', $('invBusinessContact').value)+'</div>'+(metadata?'<div class="invoiceMeta">'+metadata+'</div>':'')+'</div>'+(customer?'<p><strong>Bill to:</strong> '+cell(customer)+'</p>':'')+detail('', $('invCustomerContact').value)+itemTable+totals+(approval?'<p class="invoiceNotes"><strong>Approval note:</strong> '+cell(approval)+'</p>':'')+(notes?'<p class="invoiceNotes">'+cell(notes)+'</p>':'');
 }
 invFields.forEach(id=>$(id).addEventListener('input',invUpdate));
 $('invCurrency').addEventListener('change',invUpdate);
 $('invDocType').addEventListener('change',invUpdate);
+$('invDiscountType').addEventListener('change',invUpdate);
 $('invAddItem').onclick=()=>invAddItem();
 $('invPrint').onclick=()=>{invUpdate();window.print()};
 invAddItem();

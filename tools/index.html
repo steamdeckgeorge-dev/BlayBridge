@@ -93,6 +93,6 @@ invFields.forEach(id=>$(id).addEventListener('input',invUpdate));
 $('invCurrency').addEventListener('change',invUpdate);
 $('invDocType').addEventListener('change',invUpdate);
 $('invAddItem').onclick=()=>invAddItem();
-$('invPrint').onclick=()=>{if(!$('invBusiness').value.trim()||!$('invCustomer').value.trim()){alert('Enter the business and customer names first.');return}invUpdate();window.print()};
+$('invPrint').onclick=()=>{invUpdate();window.print()};
 invAddItem();
 </script></body></html>

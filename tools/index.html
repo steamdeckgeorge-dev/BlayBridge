@@ -27,7 +27,7 @@
 <label>Reference / purchase request number (optional)<input id="invReference" maxlength="100" placeholder="e.g. HR-REQ-001"></label>
 <label>Valid until (optional)<input id="invValidUntil" type="date"></label>
 <label>Due date<input id="invDue" type="date"></label>
-<label for="invCurrency">Currency<select id="invCurrency" aria-label="Invoice currency"><option value="GBP">British Pound (£) — GBP</option><option value="GHS">Ghanaian Cedi (GH₵) — GHS</option><option value="USD">US Dollar ($) — USD</option><option value="EUR">Euro (€) — EUR</option><option value="NGN">Nigerian Naira (₦) — NGN</option><option value="CAD">Canadian Dollar (C$) — CAD</option><option value="AUD">Australian Dollar (A$) — AUD</option><option value="ZAR">South African Rand (R) — ZAR</option><option value="KES">Kenyan Shilling (KSh) — KES</option><option value="INR">Indian Rupee (₹) — INR</option><option value="JPY">Japanese Yen (¥) — JPY</option><option value="CNY">Chinese Yuan (¥) — CNY</option><option value="AED">UAE Dirham (د.إ) — AED</option><option value="SAR">Saudi Riyal (﷼) — SAR</option><option value="CHF">Swiss Franc (CHF) — CHF</option><option value="NZD">New Zealand Dollar (NZ$) — NZD</option><option value="SGD">Singapore Dollar (S$) — SGD</option><option value="XOF">West African CFA Franc (XOF) — XOF</option><option value="XAF">Central African CFA Franc (XAF) — XAF</option><option value="BRL">Brazilian Real (R$) — BRL</option></select></label>
+<label for="invCurrency">Currency<select id="invCurrency" aria-label="Invoice currency"><option value="GBP">British Pound (£) — GBP</option><option value="GHS">Ghanaian Cedi (GH₵) — GHS</option><option value="USD">US Dollar ($) — USD</option><option value="EUR">Euro (€) — EUR</option><option value="NGN">Nigerian Naira (₦) — NGN</option><option value="CAD">Canadian Dollar (C$) — CAD</option><option value="AUD">Australian Dollar (A$) — AUD</option><option value="ZAR">South African Rand (R) — ZAR</option><option value="KES">Kenyan Shilling (KSh) — KES</option><option value="INR">Indian Rupee (₹) — INR</option><option value="JPY">Japanese Yen (¥) — JPY</option><option value="CNY">Chinese Yuan (¥) — CNY</option><option value="AED">UAE Dirham (د.إ) — AED</option><option value="SAR">Saudi Riyal (﷼) — SAR</option><option value="CHF">Swiss Franc (CHF) — CHF</option><option value="NZD">New Zealand Dollar (NZ$) — NZD</option><option value="SGD">Singapore Dollar (S$) — SGD</option><option value="XOF">West African CFA Franc (XOF) — XOF</option><option value="XAF">Central African CFA Franc (XAF) — XAF</option><option value="BRL">Brazilian Real (R$) — BRL</option></select></label><label>Enter your currency (optional)<input id="invCustomCurrency" maxlength="30" placeholder="e.g. GMD, Le, Bitcoin, or your currency symbol"></label>
 </div>
 <div class="invoiceItemsHeader"><strong>Invoice items</strong><button type="button" id="invAddItem">+ Add item</button></div>
 <div id="invItems"></div>
@@ -67,7 +67,7 @@ $('invLogo').addEventListener('change',()=>{
  reader.readAsDataURL(file);
 });
 $('invRemoveLogo').onclick=()=>{invLogoData='';$('invLogo').value='';$('invLogoStatus').textContent='No logo selected.';invUpdate()};
-const invFields=['invBusiness','invBusinessContact','invCustomer','invCustomerContact','invNumber','invDate','invDue','invDocType','invReference','invValidUntil','invApprovalNote','invCurrency','invTaxType','invTax','invDiscountType','invDiscount','invNotes'];
+const invFields=['invBusiness','invBusinessContact','invCustomer','invCustomerContact','invNumber','invDate','invDue','invDocType','invReference','invValidUntil','invApprovalNote','invCurrency','invCustomCurrency','invTaxType','invTax','invDiscountType','invDiscount','invNotes'];
 $('invDate').value=new Date().toISOString().slice(0,10);
 function invAddItem(description='',amount=''){
  const row=document.createElement('div');row.className='invoiceItem';
@@ -77,7 +77,7 @@ function invAddItem(description='',amount=''){
  row.addEventListener('input',invUpdate);$('invItems').append(row);invUpdate();
 }
 function invUpdate(){
- const currency=$('invCurrency').value||'GBP';
+ const currency=$('invCustomCurrency').value.trim()||$('invCurrency').value||'GBP';
  const money=n=>currency+' '+n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
  const cell=v=>invEscape(v);
  const rows=[...document.querySelectorAll('.invoiceItem')].map(el=>({description:el.querySelector('.invDescription').value.trim(),rawAmount:el.querySelector('.invAmount').value,amount:invNum(el.querySelector('.invAmount').value)})).filter(item=>item.description||item.rawAmount.trim());

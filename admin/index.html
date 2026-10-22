@@ -25,7 +25,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 small{color:#64748b}
 a{color:#175bd2}
 .editorToolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:10px 0;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc}.editorToolbar button{padding:8px 12px;margin:0}.editorToolbar select{width:auto;max-width:170px;margin:0;padding:8px}.editorToolbar input[type=color]{width:46px;height:38px;padding:3px;margin:0}.editorToolbar label{font-size:13px}#richBody{min-height:340px;border:1px solid #cbd5e1;border-radius:8px;padding:15px;outline-offset:3px;line-height:1.7;overflow-wrap:anywhere;background:white}#richBody:empty:before{content:attr(data-placeholder);color:#64748b}#richBody p{margin:0 0 1em}#richBody:focus{outline:2px solid #175bd2}
-</style>
+.richShort{border:1px solid #cbd5e1;border-radius:8px;padding:12px;min-height:52px;line-height:1.5;background:white;overflow-wrap:anywhere}.richShort:focus{outline:2px solid #175bd2}</style>
 </head>
 <body>
 <header>
@@ -47,8 +47,7 @@ a{color:#175bd2}
 <h2>Write or edit article</h2>
 <form id="postForm">
 <input type="hidden" id="postId">
-<label>Title</label>
-<input id="title" maxlength="180" required>
+<label>Title</label><div class="editorToolbar" role="toolbar" aria-label="titleRich formatting"><button type="button" data-target="titleRich" data-action="bold"><strong>B</strong></button><button type="button" data-target="titleRich" data-action="italic"><em>I</em></button><button type="button" data-target="titleRich" data-action="underline"><u>U</u></button><button type="button" data-target="titleRich" data-action="undo" title="Undo">↶ Undo</button><button type="button" data-target="titleRich" data-action="redo" title="Redo">↷ Redo</button><label>Size <select data-target="titleRich" data-style="fontSize"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Extra large</option><option value="6">Heading</option></select></label><label>Font <select data-target="titleRich" data-style="fontName"><option>Arial</option><option>Georgia</option><option>Verdana</option><option>Tahoma</option><option>Times New Roman</option><option>Courier New</option><option value="system-ui">System default</option></select></label><label>Colour <input type="color" data-target="titleRich" data-style="foreColor" value="#17243c"></label><button type="button" data-target="titleRich" data-action="removeFormat">Clear</button></div><div id="titleRich" contenteditable="true" class="richShort" role="textbox" aria-label="Article title"></div><input id="title" maxlength="180" required hidden>
 <label>Category</label>
 <select id="category">
 <option>Technology</option>
@@ -57,8 +56,7 @@ a{color:#175bd2}
 <option>Digital Skills</option>
 <option>Intelligent Insights</option>
 </select>
-<label>Short summary</label>
-<textarea id="excerpt" maxlength="500"></textarea>
+<label>Short summary</label><div class="editorToolbar" role="toolbar" aria-label="excerptRich formatting"><button type="button" data-target="excerptRich" data-action="bold"><strong>B</strong></button><button type="button" data-target="excerptRich" data-action="italic"><em>I</em></button><button type="button" data-target="excerptRich" data-action="underline"><u>U</u></button><button type="button" data-target="excerptRich" data-action="undo" title="Undo">↶ Undo</button><button type="button" data-target="excerptRich" data-action="redo" title="Redo">↷ Redo</button><label>Size <select data-target="excerptRich" data-style="fontSize"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Extra large</option><option value="6">Heading</option></select></label><label>Font <select data-target="excerptRich" data-style="fontName"><option>Arial</option><option>Georgia</option><option>Verdana</option><option>Tahoma</option><option>Times New Roman</option><option>Courier New</option><option value="system-ui">System default</option></select></label><label>Colour <input type="color" data-target="excerptRich" data-style="foreColor" value="#17243c"></label><button type="button" data-target="excerptRich" data-action="removeFormat">Clear</button></div><div id="excerptRich" contenteditable="true" class="richShort" role="textbox" aria-label="Short summary"></div><textarea id="excerpt" maxlength="500" hidden></textarea>
 <label>Full article</label>
 <div class="editorToolbar" role="toolbar" aria-label="Article formatting">
 <button type="button" data-format="bold" title="Bold"><strong>B</strong></button>
@@ -67,7 +65,7 @@ a{color:#175bd2}
 <label for="fontSize">Size</label><select id="fontSize" aria-label="Font size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Extra large</option><option value="6">Heading</option></select>
 <label for="fontFamily">Font</label><select id="fontFamily" aria-label="Font family"><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Verdana">Verdana</option><option value="Tahoma">Tahoma</option><option value="Times New Roman">Times New Roman</option><option value="Courier New">Courier New</option><option value="system-ui">System default</option></select>
 <label for="fontColour">Colour</label><input id="fontColour" type="color" value="#17243c" aria-label="Text colour">
-<button type="button" id="clearFormatting">Clear formatting</button>
+<button type="button" id="undoBody">↶ Undo</button><button type="button" id="redoBody">↷ Redo</button><button type="button" id="clearFormatting">Clear formatting</button>
 </div>
 <div id="richBody" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Full article editor" data-placeholder="Write or paste the full article here"></div>
 <textarea id="body" required maxlength="150000" hidden></textarea><p><small id="bodyCount">0 / 150,000 characters</small></p>
@@ -157,9 +155,9 @@ async function loadPosts(){
 function editPost(i){
  const p=posts[i];
  $('postId').value=p.id;
- $('title').value=p.title||'';
+ setShortField('title',p.title||'');
  $('category').value=p.category||'Technology';
- $('excerpt').value=p.excerpt||'';
+ setShortField('excerpt',p.excerpt||'');
  setArticleBody(p.body||'');
  $('source').value=p.source_url||'';
  $('postStatus').value=p.status||'draft';
@@ -212,7 +210,7 @@ function updateBodyCount(){
  const count=$('richBody').innerText.length;
  $('bodyCount').textContent=count.toLocaleString()+' characters (maximum 150,000 stored)';
 }
-function resetPost(){$('postForm').reset();$('postId').value='';$('richBody').innerHTML='';syncArticleBody()}
+function resetPost(){$('postForm').reset();$('postId').value='';$('richBody').innerHTML='';$('titleRich').innerHTML='';$('excerptRich').innerHTML='';syncArticleBody();syncShortField('title');syncShortField('excerpt')}
 $('richBody').addEventListener('input',syncArticleBody);
 $('richBody').addEventListener('paste',e=>{e.preventDefault();document.execCommand('insertText',false,e.clipboardData.getData('text/plain'))});
 document.querySelectorAll('[data-format]').forEach(button=>button.addEventListener('click',()=>{ $('richBody').focus();document.execCommand(button.dataset.format,false,null);syncArticleBody()}));
@@ -220,9 +218,24 @@ $('fontSize').addEventListener('change',e=>{ $('richBody').focus();document.exec
 $('fontFamily').addEventListener('change',e=>{ $('richBody').focus();document.execCommand('fontName',false,e.target.value);syncArticleBody()});
 $('fontColour').addEventListener('input',e=>{ $('richBody').focus();document.execCommand('foreColor',false,e.target.value);syncArticleBody()});
 $('clearFormatting').addEventListener('click',()=>{$('richBody').focus();document.execCommand('removeFormat',false,null);syncArticleBody()});
+const shortFields={title:180,excerpt:500};
+function syncShortField(name){const rich=$(name+'Rich');const text=rich.innerText.trim();$(name).value=text;rich.dataset.overLimit=text.length>shortFields[name]?'yes':'no'}
+function setShortField(name,text){$(name+'Rich').textContent=text;syncShortField(name)}
+for(const name of Object.keys(shortFields)){
+ const rich=$(name+'Rich');
+ rich.addEventListener('input',()=>syncShortField(name));
+ rich.addEventListener('paste',e=>{e.preventDefault();document.execCommand('insertText',false,e.clipboardData.getData('text/plain'))});
+}
+document.querySelectorAll('.editorToolbar [data-action]').forEach(b=>b.addEventListener('click',()=>{const el=$(b.dataset.target);el.focus();document.execCommand(b.dataset.action,false,null);if(b.dataset.target==='richBody')syncArticleBody();else syncShortField(b.dataset.target==='titleRich'?'title':'excerpt')}));
+document.querySelectorAll('.editorToolbar [data-style]').forEach(control=>control.addEventListener('change',()=>{const el=$(control.dataset.target);el.focus();document.execCommand(control.dataset.style,false,control.value);if(control.dataset.target==='richBody')syncArticleBody();else syncShortField(control.dataset.target==='titleRich'?'title':'excerpt')}));
+$('undoBody').addEventListener('click',()=>{$('richBody').focus();document.execCommand('undo');syncArticleBody()});
+$('redoBody').addEventListener('click',()=>{$('richBody').focus();document.execCommand('redo');syncArticleBody()});
+syncShortField('title');syncShortField('excerpt');
 syncArticleBody();
 $('postForm').onsubmit=async e=>{
  e.preventDefault();
+ syncShortField('title');syncShortField('excerpt');
+ if(!$('title').value||$('title').value.length>180||$('excerpt').value.length>500){alert('Title must be 1–180 characters and summary must be at most 500 characters.');return}
  syncArticleBody();
  if($('body').value.length>150000){alert('Article exceeds the 150,000-character limit.');return}
  if(!$('richBody').innerText.trim()){alert('Please enter the article text.');return}

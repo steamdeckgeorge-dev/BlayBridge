@@ -214,6 +214,7 @@ export async function onRequest({ request, env, params }) {
   const homeDefaults={eyebrow:"IDEAS WORTH EXPLORING",title:"Understand the world. Stay ahead of what\u0027s next.",description:"Clear thinking on technology, artificial intelligence, science, digital skills and the ideas shaping our future.",button:"Explore articles →"};
   if(path==="site-content"&&method==="GET"){const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("homepage").first();let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}return json({...homeDefaults,...saved})}
 
+  if(path==="about-content"&&method==="GET"){const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("about").first();let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}return json({content:saved})}
   if(path==="videos"&&method==="GET"){const {results}=await env.DB.prepare("SELECT youtube_id,title,description,category,url,cta,sponsored FROM media_videos WHERE status='published' ORDER BY updated_at DESC LIMIT 100").all();return json({videos:results.map(v=>({youtubeId:v.youtube_id,title:v.title,description:v.description,category:v.category,url:v.url,cta:v.cta,sponsored:!!v.sponsored}))})}
   // PUBLIC ARTICLES
   if (path === "posts" && method === "GET") {
@@ -265,6 +266,8 @@ export async function onRequest({ request, env, params }) {
     }, 401);
   }
 
+  if(path==="admin/about-content"&&method==="GET"){const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("about").first();let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}return json({content:saved})}
+  if(path==="admin/about-content"&&method==="POST"){const d=await bodyJson(request);if(!d||typeof d!=="object")return json({error:"Invalid request"},400);const limits={heading:120,intro:2500,mission:2500,editorial:2500,contact:2500},saved={};for(const [key,max] of Object.entries(limits)){if(typeof d[key]!=="string"||!d[key].trim()||d[key].length>max)return json({error:"Please provide "+key+" (maximum "+max+" characters)."},400);saved[key]=d[key].trim()}await env.DB.prepare("INSERT INTO site_settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").bind("about",JSON.stringify(saved)).run();return json({ok:true})}
   if(path==="admin/site-content"&&method==="GET"){const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("homepage").first();let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}return json({...homeDefaults,...saved})}
   if(path==="admin/site-content"&&method==="POST"){const d=await bodyJson(request);if(!d||typeof d!=="object")return json({error:"Invalid request"},400);const limits={eyebrow:80,title:180,description:500,button:60},saved={};for(const [key,max] of Object.entries(limits)){if(typeof d[key]!=="string"||!d[key].trim()||d[key].trim().length>max)return json({error:"Invalid "+key+" text"},400);saved[key]=d[key].trim()}await env.DB.prepare("INSERT INTO site_settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").bind("homepage",JSON.stringify(saved)).run();return json({ok:true})}
 

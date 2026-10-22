@@ -253,9 +253,10 @@ export async function onRequest({ request, env, params }) {
     const origin=request.headers.get("Origin");
     if(origin!==new URL(request.url).origin)return json({error:"Cross-origin admin request rejected"},403);
     const type=(request.headers.get("Content-Type")||"").toLowerCase();
-    const upload=path.startsWith("admin/ads/image/");
+    const upload=path.startsWith("admin/ads/image/")||path==="admin/hero-image";
     const length=Number(request.headers.get("Content-Length")||0);
     if(length>(upload?6*1024*1024:256*1024))return json({error:"Request too large"},413);
+    if(path==="admin/hero-image"&&!["image/jpeg","image/png","image/webp"].includes(type))return json({error:"JPG, PNG or WebP required"},415);
     if(!upload&&!type.startsWith("application/json"))return json({error:"JSON content type required"},415);
   }
   // ADMIN AUTHENTICATION

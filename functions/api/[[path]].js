@@ -5,7 +5,7 @@ const json = (value, status = 200) =>
     headers: {
       "content-type": "application/json; charset=utf-8",
       "cache-control": "no-store",
-      "x-content-type-options": "nosniff"
+      "x-content-type-options": "nosniff", "referrer-policy": "strict-origin-when-cross-origin", "x-frame-options": "DENY", "permissions-policy": "camera=(), microphone=(), geolocation=()"
     }
   });
 
@@ -245,6 +245,16 @@ export async function onRequest({ request, env, params }) {
     return new Response(object.body,{headers:{'content-type':type,'cache-control':'public, max-age=300','x-content-type-options':'nosniff','content-security-policy':"default-src 'none'; sandbox"}});
   }
 
+  // Same-origin requirement for state-changing admin requests.
+  if(path.startsWith("admin/") && !["GET","HEAD","OPTIONS"].includes(method)){
+    const origin=request.headers.get("Origin");
+    if(origin!==new URL(request.url).origin)return json({error:"Cross-origin admin request rejected"},403);
+    const type=(request.headers.get("Content-Type")||"").toLowerCase();
+    const upload=path.startsWith("admin/ads/image/");
+    const length=Number(request.headers.get("Content-Length")||0);
+    if(length>(upload?6*1024*1024:256*1024))return json({error:"Request too large"},413);
+    if(!upload&&!type.startsWith("application/json"))return json({error:"JSON content type required"},415);
+  }
   // ADMIN AUTHENTICATION
   const failure = await checkAccess(request, env);
 
@@ -281,6 +291,10 @@ export async function onRequest({ request, env, params }) {
     const png=sig[0]===137&&sig[1]===80&&sig[2]===78&&sig[3]===71&&sig[4]===13&&sig[5]===10&&sig[6]===26&&sig[7]===10;
     const webp=String.fromCharCode(...sig.slice(0,4))==='RIFF'&&String.fromCharCode(...sig.slice(8,12))==='WEBP';
     if(!((file.type==='image/jpeg'&&jpg)||(file.type==='image/png'&&png)||(file.type==='image/webp'&&webp)))return json({error:'Invalid image file'},400);
+    const b=new Uint8Array(bytes);
+    if(png&&(b.length<45||String.fromCharCode(...b.slice(12,16))!=='IHDR'))return json({error:'Invalid PNG structure'},400);
+    if(webp&&(b.length<30||new DataView(bytes).getUint32(4,true)+8!==b.length))return json({error:'Invalid WebP structure'},400);
+    if(jpg&&(b.length<4||b[b.length-2]!==255||b[b.length-1]!==217))return json({error:'Invalid JPEG structure'},400);
     await env.OFFERS_BUCKET.put('offers/'+id,bytes,{httpMetadata:{contentType:file.type}});
     const image_url='/api/offer-image/'+id;
     await env.DB.prepare('UPDATE personal_ads SET image_url=?,updated_at=datetime(\'now\') WHERE id=?').bind(image_url,id).run();

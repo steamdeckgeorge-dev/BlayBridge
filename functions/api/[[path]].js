@@ -394,20 +394,19 @@ export async function onRequest({ request, env, params }) {
     const status =
       data.status === "published" ? "published" : "draft";
 
-    if (
-      !title ||
-      title.length > 180 ||
-      !body ||
-      body.length > 150000 ||
-      excerpt.length > 500 ||
-      category.length > 80 ||
-      source.length > 12000 ||
-      (source && (source.split(/\r?\n/).filter(line => line.trim()).length > 30 || source.split(/\r?\n/).filter(line => line.trim()).some(line => !/^https:\/\/[^\s]+$/i.test(line.trim()))))
-    ) {
-      return json({
-        error: "Check title, body, excerpt, category and HTTPS source URL."
-      }, 400);
-    }
+    const sourceLines = source.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    const invalidSource = sourceLines.find(line => !/^https:\/\/[^\s]+$/i.test(line));
+    const errors = [];
+    if (!title) errors.push("Article title is missing.");
+    if (title.length > 180) errors.push("Article title exceeds 180 characters.");
+    if (!body || body === "BBRICH1:") errors.push("Full article text is missing.");
+    if (body.length > 150000) errors.push("Full article exceeds 150,000 stored characters.");
+    if (excerpt.length > 500) errors.push("Short summary exceeds 500 characters.");
+    if (category.length > 80) errors.push("Category exceeds 80 characters.");
+    if (source.length > 12000) errors.push("Source URLs exceed 12,000 characters.");
+    if (sourceLines.length > 30) errors.push("You can add a maximum of 30 source URLs.");
+    if (invalidSource) errors.push("Each source must be a complete HTTPS link, one per line. Invalid entry: " + invalidSource.slice(0, 90));
+    if (errors.length) return json({ error: errors.join("\n") }, 400);
 
     const id = validId(data.id)
       ? data.id

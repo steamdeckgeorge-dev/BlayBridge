@@ -60,8 +60,9 @@ a{color:#175bd2}
 <textarea id="excerpt" maxlength="500"></textarea>
 <label>Full article</label>
 <textarea id="body" required maxlength="150000" style="min-height:340px" placeholder="Paste the complete article here"></textarea><p><small id="bodyCount">0 / 150,000 characters</small></p>
-<label>Source URL (optional)</label>
-<input id="source" type="url" placeholder="https://example.com">
+<label for="source">Source URLs (optional — one HTTPS URL per line)</label>
+<textarea id="source" rows="5" maxlength="12000" placeholder="https://example.com/source-one&#10;https://example.com/source-two"></textarea>
+<p><small>Add up to 30 source links, one per line.</small></p>
 <label>Publication status</label>
 <select id="postStatus">
 <option value="draft">Draft — not public</option>

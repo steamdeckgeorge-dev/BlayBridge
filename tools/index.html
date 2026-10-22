@@ -24,7 +24,7 @@
 <label>Invoice number<input id="invNumber" maxlength="60" placeholder="INV-001"></label>
 <label>Invoice date<input id="invDate" type="date"></label>
 <label>Due date<input id="invDue" type="date"></label>
-<label>Currency<input id="invCurrency" maxlength="8" value="GBP" placeholder="GBP, USD, GHS"></label>
+<label for="invCurrency">Currency<select id="invCurrency" aria-label="Invoice currency"><option value="GBP">British Pound (£) — GBP</option><option value="GHS">Ghanaian Cedi (GH₵) — GHS</option><option value="USD">US Dollar ($) — USD</option><option value="EUR">Euro (€) — EUR</option><option value="NGN">Nigerian Naira (₦) — NGN</option><option value="CAD">Canadian Dollar (C$) — CAD</option><option value="AUD">Australian Dollar (A$) — AUD</option><option value="ZAR">South African Rand (R) — ZAR</option><option value="KES">Kenyan Shilling (KSh) — KES</option><option value="INR">Indian Rupee (₹) — INR</option><option value="JPY">Japanese Yen (¥) — JPY</option><option value="CNY">Chinese Yuan (¥) — CNY</option><option value="AED">UAE Dirham (د.إ) — AED</option><option value="SAR">Saudi Riyal (﷼) — SAR</option><option value="CHF">Swiss Franc (CHF) — CHF</option><option value="NZD">New Zealand Dollar (NZ$) — NZD</option><option value="SGD">Singapore Dollar (S$) — SGD</option><option value="XOF">West African CFA Franc (XOF) — XOF</option><option value="XAF">Central African CFA Franc (XAF) — XAF</option><option value="BRL">Brazilian Real (R$) — BRL</option></select></label>
 </div>
 <div class="invoiceItemsHeader"><strong>Invoice items</strong><button type="button" id="invAddItem">+ Add item</button></div>
 <div id="invItems"></div>
@@ -82,6 +82,7 @@ function invUpdate(){
  $('invPreview').innerHTML='<div class="invoiceHead"><div>'+(invLogoData?'<img src="'+invLogoData+'" alt="Company logo" class="invoiceLogo">':'')+'<h2>INVOICE</h2><strong>'+cell($('invBusiness').value||'Your business')+'</strong><p class="invoiceNotes">'+cell($('invBusinessContact').value)+'</p></div><div class="invoiceMeta"><strong>'+cell($('invNumber').value||'Invoice')+'</strong><p>Issued: '+cell($('invDate').value||'—')+'<br>Due: '+cell($('invDue').value||'—')+'</p></div></div><p><strong>Bill to:</strong> '+cell($('invCustomer').value||'Customer')+'</p><p class="invoiceNotes">'+cell($('invCustomerContact').value)+'</p><table><thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Amount</th></tr></thead><tbody>'+rows.map(item=>'<tr><td>'+cell(item.description||'Item')+'</td><td class="num">'+cell(item.qty)+'</td><td class="num">'+money(item.rate)+'</td><td class="num">'+money(item.qty*item.rate)+'</td></tr>').join('')+'</tbody></table><p style="text-align:right">Subtotal: '+money(subtotal)+'<br>Discount: −'+money(discount)+'<br>Tax ('+taxRate+'%): '+money(tax)+'</p><h3 style="text-align:right">Total: '+money(total)+'</h3><p class="invoiceNotes">'+cell($('invNotes').value)+'</p>';
 }
 invFields.forEach(id=>$(id).addEventListener('input',invUpdate));
+$('invCurrency').addEventListener('change',invUpdate);
 $('invAddItem').onclick=()=>invAddItem();
 $('invPrint').onclick=()=>{if(!$('invBusiness').value.trim()||!$('invCustomer').value.trim()){alert('Enter the business and customer names first.');return}invUpdate();window.print()};
 invAddItem();

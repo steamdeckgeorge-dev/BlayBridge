@@ -24,6 +24,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .item{border-top:1px solid #e2e8f0;padding:15px 0}
 small{color:#64748b}
 a{color:#175bd2}
+.editorToolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:10px 0;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc}.editorToolbar button{padding:8px 12px;margin:0}.editorToolbar select{width:auto;max-width:170px;margin:0;padding:8px}.editorToolbar input[type=color]{width:46px;height:38px;padding:3px;margin:0}.editorToolbar label{font-size:13px}#richBody{min-height:340px;border:1px solid #cbd5e1;border-radius:8px;padding:15px;outline-offset:3px;line-height:1.7;overflow-wrap:anywhere;background:white}#richBody:empty:before{content:attr(data-placeholder);color:#64748b}#richBody p{margin:0 0 1em}#richBody:focus{outline:2px solid #175bd2}
 </style>
 </head>
 <body>
@@ -59,7 +60,17 @@ a{color:#175bd2}
 <label>Short summary</label>
 <textarea id="excerpt" maxlength="500"></textarea>
 <label>Full article</label>
-<textarea id="body" required maxlength="150000" style="min-height:340px" placeholder="Paste the complete article here"></textarea><p><small id="bodyCount">0 / 150,000 characters</small></p>
+<div class="editorToolbar" role="toolbar" aria-label="Article formatting">
+<button type="button" data-format="bold" title="Bold"><strong>B</strong></button>
+<button type="button" data-format="italic" title="Italic"><em>I</em></button>
+<button type="button" data-format="underline" title="Underline"><u>U</u></button>
+<label for="fontSize">Size</label><select id="fontSize" aria-label="Font size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Extra large</option><option value="6">Heading</option></select>
+<label for="fontFamily">Font</label><select id="fontFamily" aria-label="Font family"><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Verdana">Verdana</option><option value="Tahoma">Tahoma</option><option value="Times New Roman">Times New Roman</option><option value="Courier New">Courier New</option><option value="system-ui">System default</option></select>
+<label for="fontColour">Colour</label><input id="fontColour" type="color" value="#17243c" aria-label="Text colour">
+<button type="button" id="clearFormatting">Clear formatting</button>
+</div>
+<div id="richBody" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Full article editor" data-placeholder="Write or paste the full article here"></div>
+<textarea id="body" required maxlength="150000" hidden></textarea><p><small id="bodyCount">0 / 150,000 characters</small></p>
 <label for="source">Source URLs (optional — one HTTPS URL per line)</label>
 <textarea id="source" rows="5" maxlength="12000" placeholder="https://example.com/source-one&#10;https://example.com/source-two"></textarea>
 <p><small>Add up to 30 source links, one per line.</small></p>
@@ -149,14 +160,72 @@ function editPost(i){
  $('title').value=p.title||'';
  $('category').value=p.category||'Technology';
  $('excerpt').value=p.excerpt||'';
- $('body').value=p.body||'';
+ setArticleBody(p.body||'');
  $('source').value=p.source_url||'';
  $('postStatus').value=p.status||'draft';
  updateBodyCount();$('postForm').scrollIntoView({behavior:'smooth'});
 }
-function resetPost(){$('postForm').reset();$('postId').value='';updateBodyCount()}function updateBodyCount(){$('bodyCount').textContent=$('body').value.length.toLocaleString()+' / 150,000 characters'}$('body').addEventListener('input',updateBodyCount);
+const richPrefix='BBRICH1:';
+function cleanRichHtml(html){
+ const doc=new DOMParser().parseFromString('<div>'+html+'</div>','text/html');
+ const allowed=new Set(['P','DIV','BR','B','STRONG','I','EM','U','SPAN','FONT','H2','H3','H4','UL','OL','LI','BLOCKQUOTE']);
+ const fonts=new Set(['arial','georgia','verdana','tahoma','times new roman','courier new','system-ui']);
+ function clean(node){
+  if(node.nodeType===3)return document.createTextNode(node.textContent);
+  if(node.nodeType!==1)return document.createDocumentFragment();
+  const tag=allowed.has(node.tagName)?node.tagName.toLowerCase():'span';
+  const el=document.createElement(tag==='font'?'span':tag);
+  if(node.tagName==='FONT'){
+   const face=(node.getAttribute('face')||'').replace(/["']/g,'').trim().toLowerCase();
+   if(fonts.has(face))el.style.fontFamily=face;
+   const color=node.getAttribute('color')||'';
+   if(/^#[a-f0-9]{6}$/i.test(color))el.style.color=color;
+   const sizes={'1':'12px','2':'14px','3':'16px','4':'20px','5':'26px','6':'32px','7':'40px'};
+   if(sizes[node.getAttribute('size')])el.style.fontSize=sizes[node.getAttribute('size')];
+  }
+  if(node.tagName==='SPAN'||node.tagName==='DIV'||node.tagName==='P'){
+   const style=node.style;
+   if(fonts.has(style.fontFamily.replace(/["']/g,'').trim().toLowerCase()))el.style.fontFamily=style.fontFamily;
+   if(/^#[a-f0-9]{3,6}$/i.test(style.color)||/^rgb\(\s*\d{1,3},\s*\d{1,3},\s*\d{1,3}\s*\)$/.test(style.color))el.style.color=style.color;
+   if(/^(12|14|16|18|20|24|26|32|40)px$/.test(style.fontSize))el.style.fontSize=style.fontSize;
+   if(style.fontWeight==='bold'||Number(style.fontWeight)>=600)el.style.fontWeight='bold';
+   if(style.fontStyle==='italic')el.style.fontStyle='italic';
+   if(style.textDecoration.includes('underline'))el.style.textDecoration='underline';
+  }
+  for(const child of [...node.childNodes])el.append(clean(child));
+  return el;
+ }
+ const root=document.createElement('div');
+ for(const child of [...doc.body.firstElementChild.childNodes])root.append(clean(child));
+ return root.innerHTML;
+}
+function setArticleBody(value){
+ $('richBody').innerHTML=value.startsWith(richPrefix)?cleanRichHtml(value.slice(richPrefix.length)):escapeHTML(value).replace(/\r?\n/g,'<br>');
+ updateBodyCount();
+}
+function syncArticleBody(){
+ const html=cleanRichHtml($('richBody').innerHTML);
+ $('body').value=richPrefix+html;
+ updateBodyCount();
+}
+function updateBodyCount(){
+ const count=$('richBody').innerText.length;
+ $('bodyCount').textContent=count.toLocaleString()+' characters (maximum 150,000 stored)';
+}
+function resetPost(){$('postForm').reset();$('postId').value='';$('richBody').innerHTML='';syncArticleBody()}
+$('richBody').addEventListener('input',syncArticleBody);
+$('richBody').addEventListener('paste',e=>{e.preventDefault();document.execCommand('insertText',false,e.clipboardData.getData('text/plain'))});
+document.querySelectorAll('[data-format]').forEach(button=>button.addEventListener('click',()=>{ $('richBody').focus();document.execCommand(button.dataset.format,false,null);syncArticleBody()}));
+$('fontSize').addEventListener('change',e=>{ $('richBody').focus();document.execCommand('fontSize',false,e.target.value);syncArticleBody()});
+$('fontFamily').addEventListener('change',e=>{ $('richBody').focus();document.execCommand('fontName',false,e.target.value);syncArticleBody()});
+$('fontColour').addEventListener('input',e=>{ $('richBody').focus();document.execCommand('foreColor',false,e.target.value);syncArticleBody()});
+$('clearFormatting').addEventListener('click',()=>{$('richBody').focus();document.execCommand('removeFormat',false,null);syncArticleBody()});
+syncArticleBody();
 $('postForm').onsubmit=async e=>{
  e.preventDefault();
+ syncArticleBody();
+ if($('body').value.length>150000){alert('Article exceeds the 150,000-character limit.');return}
+ if(!$('richBody').innerText.trim()){alert('Please enter the article text.');return}
  try{
   await api('admin/posts',{
    method:'POST',

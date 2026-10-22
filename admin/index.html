@@ -61,7 +61,7 @@ a{color:#175bd2}
 <option>Latest Information</option>
 <option>Digital Guides</option>
 </select>
-<label>Short summary</label><div class="editorToolbar" role="toolbar" aria-label="excerptRich formatting"><button type="button" data-target="excerptRich" data-action="bold"><strong>B</strong></button><button type="button" data-target="excerptRich" data-action="italic"><em>I</em></button><button type="button" data-target="excerptRich" data-action="underline"><u>U</u></button><button type="button" data-target="excerptRich" data-action="undo" title="Undo">↶ Undo</button><button type="button" data-target="excerptRich" data-action="redo" title="Redo">↷ Redo</button><label>Size <select data-target="excerptRich" data-style="fontSize"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Extra large</option><option value="6">Heading</option></select></label><label>Font <select data-target="excerptRich" data-style="fontName"><option>Arial</option><option>Georgia</option><option>Verdana</option><option>Tahoma</option><option>Times New Roman</option><option>Courier New</option><option value="system-ui">System default</option></select></label><label>Colour <input type="color" data-target="excerptRich" data-style="foreColor" value="#17243c"></label><button type="button" data-target="excerptRich" data-action="removeFormat">Clear</button></div><div id="excerptRich" contenteditable="true" class="richShort" role="textbox" aria-label="Short summary"></div><textarea id="excerpt" maxlength="500" hidden></textarea>
+<div id="articleCoverPanel" style="padding:16px;border:1px solid #d4dce8;border-radius:12px;margin:16px 0" hidden><h3>Article cover — Latest and Guides</h3><p>Choose what appears above the article title.</p><label>Cover type</label><select id="articleCoverType"><option value="none">No cover</option><option value="image">Upload picture</option><option value="animation">Upload looping animation</option><option value="youtube">Embed YouTube video</option></select><div id="articleCoverFileWrap" hidden><label>Cover file (JPG/PNG/WebP up to 5 MB; MP4/WebM up to 15 MB)</label><input id="articleCoverFile" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"></div><div id="articleCoverYoutubeWrap" hidden><label>YouTube video link</label><input id="articleCoverYoutube" type="url" placeholder="https://www.youtube.com/watch?v=..."></div><p id="articleCoverHint"><small>Save the article to publish its cover.</small></p></div><label>Short summary</label><div class="editorToolbar" role="toolbar" aria-label="excerptRich formatting"><button type="button" data-target="excerptRich" data-action="bold"><strong>B</strong></button><button type="button" data-target="excerptRich" data-action="italic"><em>I</em></button><button type="button" data-target="excerptRich" data-action="underline"><u>U</u></button><button type="button" data-target="excerptRich" data-action="undo" title="Undo">↶ Undo</button><button type="button" data-target="excerptRich" data-action="redo" title="Redo">↷ Redo</button><label>Size <select data-target="excerptRich" data-style="fontSize"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Extra large</option><option value="6">Heading</option></select></label><label>Font <select data-target="excerptRich" data-style="fontName"><option>Arial</option><option>Georgia</option><option>Verdana</option><option>Tahoma</option><option>Times New Roman</option><option>Courier New</option><option value="system-ui">System default</option></select></label><label>Colour <input type="color" data-target="excerptRich" data-style="foreColor" value="#17243c"></label><button type="button" data-target="excerptRich" data-action="removeFormat">Clear</button></div><div id="excerptRich" contenteditable="true" class="richShort" role="textbox" aria-label="Short summary"></div><textarea id="excerpt" maxlength="500" hidden></textarea>
 <label>Full article</label>
 <div class="editorToolbar" role="toolbar" aria-label="Article formatting">
 <button type="button" data-format="bold" title="Bold"><strong>B</strong></button>
@@ -166,6 +166,7 @@ function editPost(i){
  setArticleBody(p.body||'');
  $('source').value=p.source_url||'';
  $('postStatus').value=p.status||'draft';
+ $('articleCoverType').value=p.cover?.type||'none';$('articleCoverYoutube').value=p.cover?.youtubeId?'https://www.youtube.com/watch?v='+p.cover.youtubeId:'';$('articleCoverFile').value='';updateArticleCoverPanel();
  updateBodyCount();$('postForm').scrollIntoView({behavior:'smooth'});
 }
 const richPrefix='BBRICH1:';
@@ -215,7 +216,7 @@ function updateBodyCount(){
  const count=$('richBody').innerText.length;
  $('bodyCount').textContent=count.toLocaleString()+' characters (maximum 150,000 stored)';
 }
-function resetPost(){$('postForm').reset();$('postId').value='';$('richBody').innerHTML='';$('titleRich').innerHTML='';$('excerptRich').innerHTML='';syncArticleBody();syncShortField('title');syncShortField('excerpt')}
+function resetPost(){$('postForm').reset();$('articleCoverType').value='none';$('articleCoverYoutube').value='';$('articleCoverFile').value='';updateArticleCoverPanel();$('postId').value='';$('richBody').innerHTML='';$('titleRich').innerHTML='';$('excerptRich').innerHTML='';syncArticleBody();syncShortField('title');syncShortField('excerpt')}
 $('richBody').addEventListener('input',syncArticleBody);
 $('richBody').addEventListener('paste',e=>{e.preventDefault();document.execCommand('insertText',false,e.clipboardData.getData('text/plain'))});
 document.querySelectorAll('[data-format]').forEach(button=>button.addEventListener('click',()=>{ restoreEditorSelection($('richBody'));document.execCommand(button.dataset.format,false,null);syncArticleBody()}));
@@ -285,6 +286,8 @@ $('undoBody').addEventListener('click',()=>{$('richBody').focus();document.execC
 $('redoBody').addEventListener('click',()=>{$('richBody').focus();document.execCommand('redo');syncArticleBody()});
 syncShortField('title');syncShortField('excerpt');
 syncArticleBody();
+function updateArticleCoverPanel(){const eligible=['Latest Information','Digital Guides'].includes($('category').value);$('articleCoverPanel').hidden=!eligible;const type=$('articleCoverType').value;$('articleCoverFileWrap').hidden=!eligible||!['image','animation'].includes(type);$('articleCoverYoutubeWrap').hidden=!eligible||type!=='youtube';$('articleCoverFile').accept=type==='animation'?'video/mp4,video/webm':'image/jpeg,image/png,image/webp';}
+$('category').addEventListener('change',updateArticleCoverPanel);$('articleCoverType').addEventListener('change',updateArticleCoverPanel);updateArticleCoverPanel();
 $('postForm').onsubmit=async e=>{
  e.preventDefault();
  syncShortField('title');syncShortField('excerpt');
@@ -293,7 +296,7 @@ $('postForm').onsubmit=async e=>{
  if($('body').value.length>150000){alert('Article exceeds the 150,000-character limit.');return}
  if(!$('richBody').innerText.trim()){alert('Please enter the article text.');return}
  try{
-  await api('admin/posts',{
+  const saved=await api('admin/posts',{
    method:'POST',
    headers:{'content-type':'application/json'},
    body:JSON.stringify({
@@ -306,7 +309,14 @@ $('postForm').onsubmit=async e=>{
     status:$('postStatus').value
    })
   });
-  resetPost();await loadPosts();alert('Article saved.');
+  if(['Latest Information','Digital Guides'].includes($('category').value)){
+   const type=$('articleCoverType').value, file=$('articleCoverFile').files[0];
+   if(type==='youtube')await api('admin/article-cover-settings',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id:saved.id,type,url:$('articleCoverYoutube').value})});
+   else if(type==='none')await api('admin/article-cover-settings',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id:saved.id,type:'none'})});
+   else if(file){if((type==='image'&&!['image/jpeg','image/png','image/webp'].includes(file.type))||(type==='animation'&&!['video/mp4','video/webm'].includes(file.type)))throw Error('Choose a valid file for the selected cover type');if(file.size>(type==='image'?5:15)*1024*1024)throw Error('Cover file exceeds size limit');const response=await fetch('/api/admin/article-cover/'+encodeURIComponent(saved.id),{method:'PUT',credentials:'same-origin',headers:{'content-type':file.type},body:file});const result=await response.json().catch(()=>({}));if(!response.ok)throw Error(result.error||'Cover upload failed')}
+   else if(!$('postId').value)throw Error('Article saved, but please choose a cover file and save again.');
+  }
+  resetPost();await loadPosts();alert('Article and cover saved.');
  }catch(error){alert(error.message)}
 };
 async function deletePost(i){

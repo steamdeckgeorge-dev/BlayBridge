@@ -59,7 +59,7 @@ a{color:#175bd2}
 <label>Short summary</label>
 <textarea id="excerpt" maxlength="500"></textarea>
 <label>Full article</label>
-<textarea id="body" required></textarea>
+<textarea id="body" required maxlength="150000" style="min-height:340px" placeholder="Paste the complete article here"></textarea><p><small id="bodyCount">0 / 150,000 characters</small></p>
 <label>Source URL (optional)</label>
 <input id="source" type="url" placeholder="https://example.com">
 <label>Publication status</label>
@@ -151,9 +151,9 @@ function editPost(i){
  $('body').value=p.body||'';
  $('source').value=p.source_url||'';
  $('postStatus').value=p.status||'draft';
- $('postForm').scrollIntoView({behavior:'smooth'});
+ updateBodyCount();$('postForm').scrollIntoView({behavior:'smooth'});
 }
-function resetPost(){$('postForm').reset();$('postId').value=''}
+function resetPost(){$('postForm').reset();$('postId').value='';updateBodyCount()}function updateBodyCount(){$('bodyCount').textContent=$('body').value.length.toLocaleString()+' / 150,000 characters'}$('body').addEventListener('input',updateBodyCount);
 $('postForm').onsubmit=async e=>{
  e.preventDefault();
  try{

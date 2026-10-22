@@ -16,7 +16,7 @@
 <section class="tool"><h2>✍️ Writing tools</h2><p>Count words and characters, or convert text case.</p><label for="writingText">Your text</label><textarea id="writingText" placeholder="Type or paste text here"></textarea><div class="output" id="writingOut" aria-live="polite">Words: 0 | Characters: 0</div><button id="upperBtn">UPPERCASE</button><button id="lowerBtn">lowercase</button><button id="titleBtn">Title Case</button><button id="copyBtn">Copy text</button></section>
 <section class="tool" id="invoiceGenerator" style="grid-column:1/-1"><h2>🧾 Free Invoice Generator</h2><p>Create an invoice with itemised costs, tax and discounts. Print it or save as PDF using your browser. No sign-up required.</p>
 <div class="invoiceFormGrid">
-<label for="invLogo">Company logo (optional)</label><input id="invLogo" type="file" accept="image/png,image/jpeg,image/webp"><button type="button" id="invRemoveLogo" style="width:auto;background:#526174">Remove logo</button><p class="note" id="invLogoStatus">Choose a PNG, JPG or WebP image (maximum 2 MB). Your logo stays on your device.</p>
+<label for="invLogo">Company logo (optional)</label><input id="invLogo" type="file" accept="image/png,image/jpeg,image/webp"><button type="button" id="invRemoveLogo" style="width:auto;background:#526174">Remove logo</button><p class="note" id="invLogoStatus">Choose a PNG, JPG or WebP image (maximum 5 MB). Your logo stays on your device.</p>
 <label>Business name<input id="invBusiness" maxlength="120" placeholder="Your business name"></label>
 <label>Business contact details<textarea id="invBusinessContact" placeholder="Email, phone and address"></textarea></label>
 <label>Bill to<input id="invCustomer" maxlength="120" placeholder="Customer or company name"></label>
@@ -56,7 +56,7 @@ let invLogoData='';
 $('invLogo').addEventListener('change',()=>{
  const file=$('invLogo').files?.[0];
  if(!file)return;
- if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>2*1024*1024){$('invLogo').value='';$('invLogoStatus').textContent='Choose a PNG, JPG or WebP image under 2 MB.';return}
+ if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>5*1024*1024){$('invLogo').value='';$('invLogoStatus').textContent='Choose a PNG, JPG or WebP image up to 5 MB.';return}
  const reader=new FileReader();
  reader.onload=()=>{if(typeof reader.result!=='string'||!reader.result.startsWith('data:image/'))return;invLogoData=reader.result;$('invLogoStatus').textContent='Logo added to invoice preview.';invUpdate()};
  reader.onerror=()=>{$('invLogoStatus').textContent='Unable to read logo. Please try another image.'};

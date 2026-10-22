@@ -261,7 +261,7 @@ export async function onRequest({ request, env, params }) {
   if (failure) {
     return json({
       error: "Unauthorised. Configure Cloudflare Access and log in.",
-      ...failure
+      diagnostic: "ACCESS_DENIED"
     }, 401);
   }
 
@@ -286,6 +286,7 @@ export async function onRequest({ request, env, params }) {
     const file=form.get('image');
     if(!file||typeof file.arrayBuffer!=='function'||file.size===0||file.size>5*1024*1024||!['image/jpeg','image/png','image/webp'].includes(file.type))return json({error:'Choose a JPG, PNG or WebP image under 5 MB'},400);
     const bytes=await file.arrayBuffer();
+    if(bytes.byteLength>5*1024*1024)return json({error:"Image too large"},413);
     const sig=new Uint8Array(bytes.slice(0,12));
     const jpg=sig[0]===255&&sig[1]===216&&sig[2]===255;
     const png=sig[0]===137&&sig[1]===80&&sig[2]===78&&sig[3]===71&&sig[4]===13&&sig[5]===10&&sig[6]===26&&sig[7]===10;

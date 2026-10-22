@@ -67,7 +67,7 @@ a{color:#175bd2}
 <button type="button" data-format="bold" title="Bold"><strong>B</strong></button>
 <button type="button" data-format="italic" title="Italic"><em>I</em></button>
 <button type="button" data-format="underline" title="Underline"><u>U</u></button>
-<label for="fontSize">Size</label><select id="fontSize" aria-label="Font size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Extra large</option><option value="6">Heading</option></select>
+<button type="button" data-format="insertUnorderedList" title="Bulleted list" aria-label="Bulleted list">• List</button><button type="button" data-format="insertOrderedList" title="Numbered list" aria-label="Numbered list">1. List</button><label for="fontSize">Size</label><select id="fontSize" aria-label="Font size"><option value="3">Normal</option><option value="2">Small</option><option value="4">Large</option><option value="5">Extra large</option><option value="6">Heading</option></select>
 <label for="fontFamily">Font</label><select id="fontFamily" aria-label="Font family"><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Verdana">Verdana</option><option value="Tahoma">Tahoma</option><option value="Times New Roman">Times New Roman</option><option value="Courier New">Courier New</option><option value="system-ui">System default</option></select>
 <label for="fontColour">Colour</label><input id="fontColour" type="color" value="#17243c" aria-label="Text colour">
 <button type="button" id="undoBody">↶ Undo</button><button type="button" id="redoBody">↷ Redo</button><button type="button" id="clearFormatting">Clear formatting</button>
@@ -249,7 +249,7 @@ function saveEditorSelection(){
  popup.className='editorToolbar isFloating';
  popup.setAttribute('role','toolbar');
  popup.setAttribute('aria-label','Floating formatting tools');
- for(const original of [...toolbar.querySelectorAll('button')].filter(b=>['bold','italic','underline','undo','redo'].includes(b.dataset.action||b.dataset.format)||['undoBody','redoBody'].includes(b.id))){
+ for(const original of [...toolbar.querySelectorAll('button')].filter(b=>['bold','italic','underline','undo','redo','insertUnorderedList','insertOrderedList'].includes(b.dataset.action||b.dataset.format)||['undoBody','redoBody'].includes(b.id))){
   const button=original.cloneNode(true);
   button.removeAttribute('id');
   button.addEventListener('pointerdown',e=>e.preventDefault());
@@ -260,9 +260,9 @@ function saveEditorSelection(){
  floatingToolbar=popup;
  const rect=range.getBoundingClientRect();
  const width=popup.offsetWidth;
- const left=Math.max(8,Math.min(rect.left+(rect.width-width)/2,window.innerWidth-width-8));
+ const left=Math.max(8,Math.min(rect.right+10,window.innerWidth-width-8));
  const height=popup.offsetHeight;
- const top=rect.bottom+height+10<window.innerHeight?rect.bottom+8:Math.max(8,rect.top-height-8);
+ const top=Math.max(8,Math.min(rect.bottom+8,window.innerHeight-height-8));
  popup.style.left=left+'px';popup.style.top=Math.max(8,top)+'px';
  return true;
 }

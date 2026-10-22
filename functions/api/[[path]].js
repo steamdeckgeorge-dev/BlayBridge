@@ -401,8 +401,8 @@ export async function onRequest({ request, env, params }) {
       body.length > 150000 ||
       excerpt.length > 500 ||
       category.length > 80 ||
-      source.length > 1000 ||
-      (source && !/^https:\/\//i.test(source))
+      source.length > 12000 ||
+      (source && (source.split(/\r?\n/).filter(line => line.trim()).length > 30 || source.split(/\r?\n/).filter(line => line.trim()).some(line => !/^https:\/\/[^\s]+$/i.test(line.trim()))))
     ) {
       return json({
         error: "Check title, body, excerpt, category and HTTPS source URL."

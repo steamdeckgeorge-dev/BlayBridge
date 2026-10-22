@@ -398,7 +398,7 @@ export async function onRequest({ request, env, params }) {
       !title ||
       title.length > 180 ||
       !body ||
-      body.length > 30000 ||
+      body.length > 150000 ||
       excerpt.length > 500 ||
       category.length > 80 ||
       source.length > 1000 ||

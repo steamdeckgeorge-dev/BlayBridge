@@ -230,39 +230,18 @@ export async function onRequest({ request, env, params }) {
     return json({ posts: results.map(p=>({...p,cover:JSON.parse(p.cover_json||'{}'),cover_json:undefined})) });
   }
 
-  // PUBLIC ADVERTISEMENTS
-  if (path === "ads" && method === "GET") {
-    const { results } = await env.DB.prepare(
-      "SELECT id,title,description,url,cta,image_url FROM personal_ads WHERE status='published' ORDER BY updated_at DESC LIMIT 12"
-    ).all();
-
-    return json({ ads: results });
-  }
-
   // Public, non-sensitive app presentation settings.
   if(path==="app-config"&&method==="GET"){
     const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("app_remote_config").first();
     let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}
     return json({announcement:{enabled:saved.announcementEnabled===true,title:saved.announcementTitle||"",message:saved.announcementMessage||""},features:saved.features||{},update:{enabled:saved.updateEnabled===true,minVersionCode:saved.minVersionCode||0,latestVersionCode:saved.latestVersionCode||0,message:saved.updateMessage||"",url:saved.updateUrl||""}});
   }
-  // PUBLIC OFFER IMAGES (only published offers)
-  if (path.startsWith('offer-image/') && method === 'GET') {
-    const id=path.slice('offer-image/'.length);
-    if(!validId(id))return json({error:'Not found'},404);
-    const row=await env.DB.prepare("SELECT image_url FROM personal_ads WHERE id=? AND status='published'").bind(id).first();
-    if(!row||row.image_url!==('/api/offer-image/'+id)||!env.OFFERS_BUCKET)return json({error:'Not found'},404);
-    const object=await env.OFFERS_BUCKET.get('offers/'+id);
-    if(!object)return json({error:'Not found'},404);
-    const type=object.httpMetadata?.contentType||'application/octet-stream';
-    return new Response(object.body,{headers:{'content-type':type,'cache-control':'public, max-age=300','x-content-type-options':'nosniff','content-security-policy':"default-src 'none'; sandbox"}});
-  }
-
   // Same-origin requirement for state-changing admin requests.
   if(path.startsWith("admin/") && !["GET","HEAD","OPTIONS"].includes(method)){
     const origin=request.headers.get("Origin");
     if(origin!==new URL(request.url).origin)return json({error:"Cross-origin admin request rejected"},403);
     const type=(request.headers.get("Content-Type")||"").toLowerCase();
-    const upload=path.startsWith("admin/article-cover/")||path.startsWith("admin/ads/image/")||path==="admin/hero-image"||path==="admin/tech-video";
+    const upload=path.startsWith("admin/article-cover/")||path==="admin/hero-image"||path==="admin/tech-video";
     const length=Number(request.headers.get("Content-Length")||0);
     if(length>((path==="admin/tech-video"||path.startsWith("admin/article-cover/"))?15*1024*1024:upload?6*1024*1024:256*1024))return json({error:"Request too large"},413);
     if(path==="admin/tech-video"&&!["video/mp4","video/webm"].includes(type))return json({error:"MP4 or WebM video required"},415);
@@ -317,97 +296,6 @@ export async function onRequest({ request, env, params }) {
     const id=validId(d.id)?d.id:crypto.randomUUID();await env.DB.prepare("INSERT INTO media_videos (id,youtube_id,title,description,category,url,cta,sponsored,status) VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET youtube_id=excluded.youtube_id,title=excluded.title,description=excluded.description,category=excluded.category,url=excluded.url,cta=excluded.cta,sponsored=excluded.sponsored,status=excluded.status,updated_at=datetime('now')").bind(id,youtubeId,title,description,category,url,cta,d.sponsored===true?1:0,d.status==="published"?"published":"draft").run();return json({ok:true,id})}
   if(path==="admin/videos/delete"&&method==="POST"){const d=await bodyJson(request);if(!d||!validId(d.id))return json({error:"Invalid ID"},400);await env.DB.prepare("DELETE FROM media_videos WHERE id=?").bind(d.id).run();return json({ok:true})}
   // ADMIN: UPLOAD OFFER IMAGE
-  if(path.startsWith('admin/ads/image/')&&method==='POST'){
-    const id=path.slice('admin/ads/image/'.length);
-    if(!validId(id))return json({error:'Invalid offer ID'},400);
-    if(!env.OFFERS_BUCKET)return json({error:'Image storage not configured: add OFFERS_BUCKET R2 binding'},503);
-    const offer=await env.DB.prepare('SELECT id FROM personal_ads WHERE id=?').bind(id).first();
-    if(!offer)return json({error:'Offer not found'},404);
-    let form;try{form=await request.formData()}catch{return json({error:'Invalid image upload'},400)}
-    const file=form.get('image');
-    if(!file||typeof file.arrayBuffer!=='function'||file.size===0||file.size>5*1024*1024||!['image/jpeg','image/png','image/webp'].includes(file.type))return json({error:'Choose a JPG, PNG or WebP image under 5 MB'},400);
-    const bytes=await file.arrayBuffer();
-    if(bytes.byteLength>5*1024*1024)return json({error:"Image too large"},413);
-    const sig=new Uint8Array(bytes.slice(0,12));
-    const jpg=sig[0]===255&&sig[1]===216&&sig[2]===255;
-    const png=sig[0]===137&&sig[1]===80&&sig[2]===78&&sig[3]===71&&sig[4]===13&&sig[5]===10&&sig[6]===26&&sig[7]===10;
-    const webp=String.fromCharCode(...sig.slice(0,4))==='RIFF'&&String.fromCharCode(...sig.slice(8,12))==='WEBP';
-    if(!((file.type==='image/jpeg'&&jpg)||(file.type==='image/png'&&png)||(file.type==='image/webp'&&webp)))return json({error:'Invalid image file'},400);
-    const b=new Uint8Array(bytes);
-    if(png&&(b.length<45||String.fromCharCode(...b.slice(12,16))!=='IHDR'))return json({error:'Invalid PNG structure'},400);
-    if(webp&&(b.length<30||new DataView(bytes).getUint32(4,true)+8!==b.length))return json({error:'Invalid WebP structure'},400);
-    if(jpg&&(b.length<4||b[b.length-2]!==255||b[b.length-1]!==217))return json({error:'Invalid JPEG structure'},400);
-    await env.OFFERS_BUCKET.put('offers/'+id,bytes,{httpMetadata:{contentType:file.type}});
-    const image_url='/api/offer-image/'+id;
-    await env.DB.prepare('UPDATE personal_ads SET image_url=?,updated_at=datetime(\'now\') WHERE id=?').bind(image_url,id).run();
-    return json({ok:true,image_url});
-  }
-
-  // ADMIN: LIST ADS
-  if (path === "admin/ads" && method === "GET") {
-    const { results } = await env.DB.prepare(
-      "SELECT * FROM personal_ads ORDER BY updated_at DESC LIMIT 100"
-    ).all();
-
-    return json({ ads: results });
-  }
-
-  // ADMIN: SAVE AD
-  if (path === "admin/ads" && method === "POST") {
-    const d = await bodyJson(request);
-
-    if (!d || typeof d !== "object") {
-      return json({ error: "Invalid JSON" }, 400);
-    }
-
-    const title = String(d.title || "").trim();
-    const description = String(d.description || "").trim();
-    const url = String(d.url || "").trim();
-    const cta = String(d.cta || "Learn more").trim();
-    const status =
-      d.status === "published" ? "published" : "draft";
-
-    if (
-      !title ||
-      title.length > 120 ||
-      !description ||
-      description.length > 500 ||
-      !/^https:\/\/[^\s]+$/i.test(url) ||
-      url.length > 1000 ||
-      !cta ||
-      cta.length > 40
-    ) {
-      return json({
-        error: "Enter a valid title, description, HTTPS link and button label."
-      }, 400);
-    }
-
-    const id = validId(d.id) ? d.id : crypto.randomUUID();
-
-    await env.DB.prepare(
-      "INSERT INTO personal_ads (id,title,description,url,cta,status) VALUES (?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,description=excluded.description,url=excluded.url,cta=excluded.cta,status=excluded.status,updated_at=datetime('now')"
-    ).bind(
-      id, title, description, url, cta, status
-    ).run();
-
-    return json({ ok: true, id });
-  }
-
-  // ADMIN: DELETE AD
-  if (path === "admin/ads/delete" && method === "POST") {
-    const d = await bodyJson(request);
-
-    if (!d || !validId(d.id)) {
-      return json({ error: "Invalid id" }, 400);
-    }
-
-    await env.DB.prepare(
-      "DELETE FROM personal_ads WHERE id=?"
-    ).bind(d.id).run();
-
-    return json({ ok: true });
-  }
-
   // ADMIN: LIST ARTICLES
   if (path === "admin/posts" && method === "GET") {
     const { results } = await env.DB.prepare(

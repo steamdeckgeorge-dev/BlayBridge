@@ -137,5 +137,34 @@ $('invClearImages').onclick=()=>{invExtraImages.signature='';invExtraImages.stam
 $('invSaveDraft').onclick=()=>{try{const data={fields:Object.fromEntries(invFields.map(id=>[id,$(id).value])),items:[...document.querySelectorAll('.invoiceItem')].map(row=>({description:row.querySelector('.invDescription').value,amount:row.querySelector('.invAmount').value})),logo:invLogoData,images:invExtraImages};localStorage.setItem('blaybridgeInvoiceDraft',JSON.stringify(data));$('invActionStatus').textContent='Draft saved in this browser.'}catch(e){$('invActionStatus').textContent='Could not save draft. Images may be too large for browser storage.'}};
 $('invLoadDraft').onclick=()=>{try{const raw=localStorage.getItem('blaybridgeInvoiceDraft');if(!raw){$('invActionStatus').textContent='No saved draft found.';return}const data=JSON.parse(raw);invFields.forEach(id=>{if(data.fields&&Object.prototype.hasOwnProperty.call(data.fields,id))$(id).value=data.fields[id]});$('invItems').innerHTML='';(data.items||[]).forEach(item=>invAddItem(item.description,item.amount));if(!data.items?.length)invAddItem();invLogoData=data.logo||'';invExtraImages.signature=data.images?.signature||'';invExtraImages.stamp=data.images?.stamp||'';invUpdate();$('invActionStatus').textContent='Saved draft loaded.'}catch(e){$('invActionStatus').textContent='Could not load the saved draft.'}};
 $('invReset').onclick=()=>{if(!confirm('Clear all invoice fields and start again? Your saved draft will remain available.'))return;invFields.forEach(id=>{const el=$(id);if(el.tagName==='SELECT')el.selectedIndex=0;else el.value=''});$('invItems').innerHTML='';invLogoData='';invExtraImages.signature='';invExtraImages.stamp='';['invLogo','invSignature','invStamp'].forEach(id=>$(id).value='');invAddItem();invUpdate();$('invActionStatus').textContent='Invoice cleared.'};
-$('invDownloadPdf').onclick=async()=>{const btn=$('invDownloadPdf');btn.disabled=true;$('invActionStatus').textContent='Preparing PDF…';try{await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js','html2pdf');invUpdate();await window.html2pdf().set({margin:10,filename:'blaybridge-'+($('invNumber').value.trim().replace(/[^a-z0-9_-]/gi,'-')||'invoice')+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from($('invPreview')).save();$('invActionStatus').textContent='PDF download started.'}catch(e){$('invActionStatus').textContent='Direct download unavailable. Use Print / Save as PDF instead.'}finally{btn.disabled=false}};
+$('invDownloadPdf').onclick=async()=>{
+ const btn=$('invDownloadPdf'),root=document.documentElement;
+ const previousScroll={x:window.scrollX,y:window.scrollY,behavior:root.style.scrollBehavior};
+ btn.disabled=true;$('invActionStatus').textContent='Preparing PDF…';
+ try{
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js','html2pdf');
+  invUpdate();
+  const preview=$('invPreview');
+  if(document.fonts?.ready)await document.fonts.ready;
+  await Promise.all([...preview.querySelectorAll('img')].map(image=>image.decode()));
+  // html2canvas must not inherit this long page's scroll offset.
+  root.style.scrollBehavior='auto';
+  window.scrollTo(0,0);
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  await window.html2pdf().set({
+   margin:10,filename:'blaybridge-'+($('invNumber').value.trim().replace(/[^a-z0-9_-]/gi,'-')||'invoice')+'.pdf',
+   image:{type:'jpeg',quality:.98},
+   html2canvas:{scale:2,useCORS:true,scrollX:0,scrollY:0,backgroundColor:'#ffffff'},
+   jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+   pagebreak:{mode:['css','legacy'],avoid:['tr','.invoiceExtraImages']}
+  }).from(preview).save();
+  $('invActionStatus').textContent='PDF download started.';
+ }catch(e){
+  $('invActionStatus').textContent='Direct download unavailable. Use Print / Save as PDF instead.';
+ }finally{
+  window.scrollTo(previousScroll.x,previousScroll.y);
+  root.style.scrollBehavior=previousScroll.behavior;
+  btn.disabled=false;
+ }
+};
 </script></body></html>

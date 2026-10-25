@@ -30,11 +30,11 @@ a{color:#175bd2}
 <body>
 <header>
 <h1>BlayBridge — Private Editor</h1>
-<p>Manage articles, drafts and personal advertisements</p>
+<p>Manage articles and drafts</p>
 </header>
 <main>
 <section id="remote-app-manager" style="border:2px solid #175bd2;background:#eef5ff"><h2>Remote App Manager</h2><p>Control Android app announcements, tool visibility, and update notices remotely.</p><a href="/admin/app-manager.html" style="display:inline-block;background:#175bd2;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Open Remote App Manager →</a></section>
-<section style="border:2px solid #175bd2;background:#eef5ff"><h2>App Advertisements</h2><p>Manage promotions shown inside the BlayBridge Tools Android app, including images, links and publication status.</p><a href="/admin/app-ads.html" style="display:inline-block;background:#175bd2;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Open App Advertisements →</a></section>
+
 <div id="status" class="notice">Checking administrator access...</div>
 
 <section><h2>Homepage wording</h2><p><small>Change the text at the top of the public homepage.</small></p><form id="homepageForm"><label>Small heading</label><input id="homeEyebrow" maxlength="80" required><label>Main heading</label><textarea id="homeTitle" maxlength="180" required></textarea><label>Description</label><textarea id="homeDescription" maxlength="500" required></textarea><label>Button text</label><input id="homeButton" maxlength="60" required><label>Cover background colour</label><input id="homeBackground" type="color" value="#102b60"><label>Cover font colour</label><input id="homeFontColor" type="color" value="#ffffff"><label><input id="homeImageEnabled" type="checkbox" style="width:auto;margin-right:8px">Show uploaded cover picture</label><label>Upload cover picture (JPG, PNG or WebP, maximum 5 MB)</label><input id="homeImageFile" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" id="uploadHero">Upload cover picture</button><p><small id="heroUploadStatus">Choose an image, upload it, then save homepage settings.</small></p><label><input id="homeAdsEnabled" type="checkbox" checked style="width:auto;margin-right:8px">Show Google AdSense advertising spaces (On / Off)</label><label>Cover greeting (bottom-right corner)</label><input id="homeGreeting" maxlength="120" placeholder="Merry Christmas! 🎄"><label><input id="homeGreetingEnabled" type="checkbox" style="width:auto;margin-right:8px"> Show greeting on homepage cover</label><button type="submit">Save homepage settings</button></form></section>
@@ -89,37 +89,11 @@ a{color:#175bd2}
 </form>
 </section>
 
-<section>
-<h2>Personal advertisements</h2>
-<div id="ads"></div>
-<form id="adForm">
-<input type="hidden" id="adId">
-<label>Advertisement title</label>
-<input id="adTitle" maxlength="120" required>
-<label>Description</label>
-<textarea id="adDescription" maxlength="500" required></textarea>
-<label>Destination URL</label>
-<input id="adUrl" type="url" required placeholder="https://example.com">
-<label>Offer image (optional — JPG, PNG or WebP, up to 5 MB)</label>
-<input id="adImage" type="file" accept="image/jpeg,image/png,image/webp">
-<p><small>Images are stored in Cloudflare R2. Configure the OFFERS_BUCKET binding before uploading.</small></p>
-<div id="adImageCurrent"></div>
-<label>Button label</label>
-<input id="adCta" maxlength="40" value="Learn more" required>
-<label>Status</label>
-<select id="adStatus">
-<option value="draft">Draft</option>
-<option value="published">Published</option>
-</select>
-<button type="submit">Save advertisement</button>
-<button type="button" class="secondary" onclick="resetAd()">Clear form</button>
-</form>
-</section>
 <p><a href="/">← View public website</a></p>
 </main>
 <script>
 const $=id=>document.getElementById(id);
-let posts=[],ads=[],authorised=false;
+let posts=[],authorised=false;
 
 function message(text){
  $('status').textContent=text;
@@ -379,70 +353,6 @@ async function importDrafts(){
   await loadPosts();
  }catch(error){alert(error.message)}
 }
-async function loadAds(){
- try{
-  const result=await api('admin/ads');
-  ads=result.ads||[];
-  $('ads').innerHTML=ads.length?ads.map((a,i)=>`
-   <div class="item">
-    <strong>${escapeHTML(a.title)}</strong>
-    <p><small>${escapeHTML(a.status)}</small></p>
-    <button onclick="editAd(${i})">Edit</button>
-    <button class="danger" onclick="deleteAd(${i})">Delete</button>
-   </div>`).join(''):'<p>No advertisements yet.</p>';
- }catch(error){
-  $('ads').textContent='Could not load advertisements: '+error.message;
- }
-}
-function editAd(i){
- const a=ads[i];
- $('adId').value=a.id;
- $('adTitle').value=a.title||'';
- $('adDescription').value=a.description||'';
- $('adUrl').value=a.url||'';
- $('adCta').value=a.cta||'Learn more';
- $('adImage').value='';
- $('adImageCurrent').textContent=a.image_url?'Current picture saved. Choose a file to replace it.':'No picture uploaded.';
- $('adStatus').value=a.status||'draft';
- $('adForm').scrollIntoView({behavior:'smooth'});
-}
-function resetAd(){$('adForm').reset();$('adId').value='';$('adImageCurrent').textContent=''}
-$('adForm').onsubmit=async e=>{
- e.preventDefault();
- try{
-  const savedOffer=await api('admin/ads',{
-   method:'POST',
-   headers:{'content-type':'application/json'},
-   body:JSON.stringify({
-    id:$('adId').value||undefined,
-    title:$('adTitle').value,
-    description:$('adDescription').value,
-    url:$('adUrl').value,
-    cta:$('adCta').value,
-    status:$('adStatus').value
-   })
-  });
-  const selectedImage=$('adImage').files[0];
-  if(selectedImage){
-   if(!['image/jpeg','image/png','image/webp'].includes(selectedImage.type)||selectedImage.size>5*1024*1024)throw new Error('Choose a JPG, PNG or WebP image under 5 MB.');
-   const saved=savedOffer;
-   const form=new FormData();form.append('image',selectedImage);
-   await api('admin/ads/image/'+saved.id,{method:'POST',body:form});
-  }
-  resetAd();await loadAds();alert('Advertisement saved.');
- }catch(error){alert(error.message)}
-};
-async function deleteAd(i){
- if(!confirm('Delete this advertisement permanently?'))return;
- try{
-  await api('admin/ads/delete',{
-   method:'POST',
-   headers:{'content-type':'application/json'},
-   body:JSON.stringify({id:ads[i].id})
-  });
-  await loadAds();
- }catch(error){alert(error.message)}
-}
 async function loadHomepage(){try{const d=await api("admin/site-content");$("homeEyebrow").value=d.eyebrow||"";$("homeTitle").value=d.title||"";$("homeDescription").value=d.description||"";$("homeButton").value=d.button||"";$("homeBackground").value=d.background||"#102b60";$("homeFontColor").value=d.fontColor||"#ffffff";$("homeImageEnabled").checked=d.imageEnabled===true;$("homeAdsEnabled").checked=d.adsEnabled!==false;$("homeGreeting").value=d.greeting||"";$("homeGreetingEnabled").checked=d.greetingEnabled===true}catch(error){message("Could not load homepage wording: "+error.message)}}
 $("homepageForm").onsubmit=async e=>{e.preventDefault();try{await api("admin/site-content",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({eyebrow:$("homeEyebrow").value,title:$("homeTitle").value,description:$("homeDescription").value,button:$("homeButton").value,background:$("homeBackground").value,fontColor:$("homeFontColor").value,imageEnabled:$("homeImageEnabled").checked,adsEnabled:$("homeAdsEnabled").checked,greeting:$("homeGreeting").value,greetingEnabled:$("homeGreetingEnabled").checked})});alert("Homepage wording saved. Refresh the homepage to see it.")}catch(error){alert(error.message)}};
 $('uploadHero').onclick=async()=>{const f=$('homeImageFile').files[0];if(!f){alert('Choose a cover picture first.');return}if(!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>5*1024*1024){alert('Use a JPG, PNG or WebP image under 5 MB.');return}const btn=$('uploadHero');btn.disabled=true;$('heroUploadStatus').textContent='Uploading picture...';try{await api('admin/hero-image',{method:'POST',headers:{'content-type':f.type},body:f});$('homeImageEnabled').checked=true;$('heroUploadStatus').textContent='Picture uploaded. Click Save homepage settings to display it.'}catch(e){$('heroUploadStatus').textContent='Upload failed: '+e.message}finally{btn.disabled=false}};
@@ -469,7 +379,7 @@ $('removeHomepageVideo').onclick=async()=>{if(!confirm('Permanently remove the h
 $('techForm').onsubmit=async e=>{e.preventDefault();try{await api('admin/tech-settings',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({enabled:$('techEnabled').checked,heading:$('techHeading').value})});alert('Animation settings saved.')}catch(e){alert('Could not save: '+e.message)}};
 async function start(){
  await loadPosts();
- if(authorised){await loadAds();await loadHomepage();await loadVideos();await loadAbout();await loadContact();await loadTech();}
+ if(authorised){await loadHomepage();await loadVideos();await loadAbout();await loadContact();await loadTech();}
 }
 start();
 </script>

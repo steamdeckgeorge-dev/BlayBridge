@@ -239,6 +239,12 @@ export async function onRequest({ request, env, params }) {
     return json({ ads: results });
   }
 
+  // Public, non-sensitive app presentation settings.
+  if(path==="app-config"&&method==="GET"){
+    const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("app_remote_config").first();
+    let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}
+    return json({announcement:{enabled:saved.announcementEnabled===true,title:saved.announcementTitle||"",message:saved.announcementMessage||""},features:saved.features||{},update:{enabled:saved.updateEnabled===true,minVersionCode:saved.minVersionCode||0,latestVersionCode:saved.latestVersionCode||0,message:saved.updateMessage||"",url:saved.updateUrl||""}});
+  }
   // PUBLIC OFFER IMAGES (only published offers)
   if (path.startsWith('offer-image/') && method === 'GET') {
     const id=path.slice('offer-image/'.length);
@@ -274,6 +280,18 @@ export async function onRequest({ request, env, params }) {
     }, 401);
   }
 
+  if(path==="admin/app-config"&&method==="GET"){
+    const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("app_remote_config").first();let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}return json({config:saved});
+  }
+  if(path==="admin/app-config"&&method==="POST"){
+    const d=await bodyJson(request);if(!d||typeof d!=="object")return json({error:"Invalid settings"},400);
+    const str=(v,max)=>typeof v==="string"&&v.length<=max;
+    if(!str(d.announcementTitle,100)||!str(d.announcementMessage,500)||!str(d.updateMessage,500)||!str(d.updateUrl,500))return json({error:"Text too long"},400);
+    if(d.updateUrl&&(!/^https:\/\//.test(d.updateUrl)||!new URL(d.updateUrl).hostname))return json({error:"Update URL must be HTTPS"},400);
+    const features={};for(const key of ["Invoice Generator","Image Resizer","Percentage Calculator","Merge PDFs","Split PDF","Rotate PDF","Images to PDF","Document Scanner","QR Generator","Sign PDF","VAT Calculator","Discount Calculator","Profit Calculator","Unit Converter"]){features[key]=d.features?.[key]!==false}
+    const config={announcementEnabled:d.announcementEnabled===true,announcementTitle:d.announcementTitle.trim(),announcementMessage:d.announcementMessage.trim(),updateEnabled:d.updateEnabled===true,minVersionCode:Math.max(0,Math.min(999999,Math.floor(Number(d.minVersionCode)||0))),latestVersionCode:Math.max(0,Math.min(999999,Math.floor(Number(d.latestVersionCode)||0))),updateMessage:d.updateMessage.trim(),updateUrl:d.updateUrl.trim(),features};
+    await env.DB.prepare("INSERT INTO site_settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").bind("app_remote_config",JSON.stringify(config)).run();return json({ok:true,config});
+  }
   if(path==="admin/contact-content"&&method==="GET"){const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("contact").first();let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}return json({content:saved})}
   if(path==="admin/contact-content"&&method==="POST"){const d=await bodyJson(request);if(!d||typeof d!=="object")return json({error:"Invalid request"},400);const heading=String(d.heading||"").trim(),message=String(d.message||"").trim(),email=String(d.email||"").trim(),note=String(d.note||"").trim();if(!heading||heading.length>120||!message||message.length>2500||!note||note.length>1500||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254)return json({error:"Check contact heading, message, email and note."},400);await env.DB.prepare("INSERT INTO site_settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").bind("contact",JSON.stringify({heading,message,email,note})).run();return json({ok:true})}
   if(path==="admin/about-content"&&method==="GET"){const row=await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("about").first();let saved={};try{saved=JSON.parse(row?.value||"{}")}catch{}return json({content:saved})}

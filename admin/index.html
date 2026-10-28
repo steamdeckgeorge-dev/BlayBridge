@@ -25,30 +25,64 @@ button:disabled{opacity:.5;cursor:not-allowed}
 small{color:#64748b}
 a{color:#175bd2}
 .editorToolbar{display:flex;position:relative;z-index:1;max-width:100%;max-height:none;overflow:visible;box-shadow:none;align-items:center;gap:7px;flex-wrap:wrap;margin:10px 0;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc}.editorToolbar.isFloating{display:flex;flex-direction:column;flex-wrap:nowrap;position:fixed;z-index:9999;width:44px;max-width:44px;max-height:min(245px,55vh);overflow-y:auto;overflow-x:hidden;padding:4px;gap:3px;background:rgba(248,250,252,.78);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);border:1px solid rgba(148,163,184,.45);box-shadow:0 4px 16px rgba(15,23,42,.12);opacity:.88;transition:opacity .15s ease}.editorToolbar.isFloating:hover,.editorToolbar.isFloating:focus-within{opacity:1}.editorToolbar.isFloating button{width:34px;min-width:34px;padding:7px 2px;font-size:12px;line-height:1.1;border-radius:6px}.editorToolbar button{padding:8px 12px;margin:0}.editorToolbar select{width:auto;max-width:170px;margin:0;padding:8px}.editorToolbar input[type=color]{width:46px;height:38px;padding:3px;margin:0}.editorToolbar label{font-size:13px}#richBody{min-height:340px;border:1px solid #cbd5e1;border-radius:8px;padding:15px;outline-offset:3px;line-height:1.7;overflow-wrap:anywhere;background:white}#richBody:empty:before{content:attr(data-placeholder);color:#64748b}#richBody p{margin:0 0 1em}#richBody:focus{outline:2px solid #175bd2}
-.richShort{border:1px solid #cbd5e1;border-radius:8px;padding:12px;min-height:52px;line-height:1.5;background:white;overflow-wrap:anywhere}.richShort:focus{outline:2px solid #175bd2}</style>
+.richShort{border:1px solid #cbd5e1;border-radius:8px;padding:12px;min-height:52px;line-height:1.5;background:white;overflow-wrap:anywhere}.richShort:focus{outline:2px solid #175bd2}
+:root{--navy:#081a36;--blue:#2463eb;--ink:#12243d;--muted:#62738a;--line:#e1e8f2;--surface:#fff;--canvas:#f3f6fb;--green:#087d5a}
+body{background:radial-gradient(circle at 8% 2%,#e7f1ff 0,transparent 28%),var(--canvas);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+header.admin-hero{background:linear-gradient(118deg,#07152e,#0c2a58 58%,#145d9c);padding:30px max(22px,calc((100% - 1120px)/2));display:flex;align-items:flex-end;justify-content:space-between;gap:22px;min-height:205px;position:relative;overflow:hidden}
+header.admin-hero:after{content:"";position:absolute;width:320px;height:320px;border:1px solid #ffffff20;border-radius:50%;right:10%;top:-190px;box-shadow:0 0 0 35px #ffffff08,0 0 0 70px #ffffff05}
+.admin-hero-inner{position:relative;z-index:1}
+.admin-brand{font-size:18px;font-weight:800;letter-spacing:-.5px;margin-bottom:23px}.admin-brand span{color:#75c5ff}.admin-brand small{font-size:10px;letter-spacing:1.6px;color:#a9c8eb;margin-left:8px}
+.admin-eyebrow{font-size:10px;letter-spacing:1.8px;font-weight:800;color:#8ecbff}
+header.admin-hero h1{font-size:clamp(27px,4vw,38px);letter-spacing:-1.2px;margin:5px 0}
+header.admin-hero p{font-size:14px;margin:4px 0;color:#d0e1f5}
+.site-link{position:relative;z-index:1;flex:none;display:inline-flex;align-items:center;gap:7px;padding:11px 15px;border-radius:12px;background:#ffffff13;border:1px solid #ffffff35;color:white;text-decoration:none;font-weight:700}
+.admin-nav{position:sticky;top:0;z-index:20;background:#ffffffed;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;gap:8px;justify-content:center;padding:10px 16px;overflow:auto}
+.admin-nav a{white-space:nowrap;text-decoration:none;color:#3d506b;font-weight:700;font-size:13px;padding:8px 12px;border-radius:999px}.admin-nav a:hover{background:#edf4ff;color:var(--blue)}
+main{max-width:1150px;margin:22px auto;padding:0 20px}
+main section{background:var(--surface);border:1px solid #e5ebf4;border-radius:17px;padding:24px;margin-bottom:18px;box-shadow:0 8px 26px #15385c0a}
+main section h2{font-size:20px;letter-spacing:-.35px;color:var(--ink);margin:0 0 10px}
+main section p{color:var(--muted)}
+.admin-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;background:transparent;border:0;box-shadow:none;padding:0}
+.admin-stat{background:white;border:1px solid var(--line);border-radius:15px;padding:17px 19px;box-shadow:0 6px 20px #15385c08}
+.admin-stat span{display:block;color:var(--muted);font-size:12px;font-weight:700}.admin-stat strong{display:block;color:var(--navy);font-size:28px;line-height:1.3}.admin-stat small{color:#78889c}
+.website-ad-intro{display:flex;align-items:center;justify-content:space-between;gap:22px;background:linear-gradient(105deg,#e9f5ff,#f7fbff)!important;border-color:#d6e9fa!important}
+.website-ad-intro .ad-label{color:#087d5a;font-size:10px;letter-spacing:1.5px;font-weight:800}
+.website-ad-intro a{display:inline-flex;flex:none;text-decoration:none;background:var(--blue);color:white;border-radius:11px;padding:11px 15px;font-weight:750}
+.notice{border:1px solid #cde1fa;background:#edf6ff;color:#23486d;border-radius:12px}
+input,textarea,select{border-color:#d6dfeb;border-radius:10px;padding:12px 13px}
+input:focus,textarea:focus,select:focus{outline:3px solid #2463eb20;border-color:#4d83f1}
+button{background:var(--blue);border-radius:9px;font-weight:700;padding:11px 16px}
+button.secondary{background:#62748b}.item{border-color:var(--line);padding:15px;background:#fbfcfe;border-radius:10px;margin:8px 0}
+@media(max-width:700px){header.admin-hero{display:block;padding:24px 20px}.site-link{margin-top:15px}.admin-overview{grid-template-columns:1fr}.website-ad-intro{display:block}.website-ad-intro a{margin-top:8px}}
+</style>
 </head>
 <body>
-<header>
-<h1>BlayBridge — Private Editor</h1>
-<p>Manage articles, drafts and personal advertisements</p>
+<header class="admin-hero">
+<div class="admin-hero-inner"><div class="admin-brand"><span>Blay</span>Bridge <small>ADMIN STUDIO</small></div><div class="admin-eyebrow">EDITORIAL CONTROL ROOM</div><h1>Manage your website</h1><p>Stories, homepage settings and website-only promotions in one place.</p></div>
+<a class="site-link" href="/">View live website ↗</a>
 </header>
+<nav class="admin-nav" aria-label="Admin shortcuts"><a href="#article-library">Articles</a><a href="#article-editor">Write an article</a><a href="#homepage-settings">Homepage</a><a href="#website-ads">Website ads</a></nav>
 <main>
-<section id="remote-app-manager" style="border:2px solid #175bd2;background:#eef5ff"><h2>Remote App Manager</h2><p>Control Android app announcements, tool visibility, and update notices remotely.</p><a href="/admin/app-manager.html" style="display:inline-block;background:#175bd2;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Open Remote App Manager →</a></section>
-<section style="border:2px solid #175bd2;background:#eef5ff"><h2>App Advertisements</h2><p>Manage promotions shown inside the BlayBridge Tools Android app, including images, links and publication status.</p><a href="/admin/app-ads.html" style="display:inline-block;background:#175bd2;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Open App Advertisements →</a></section>
+<section class="admin-overview" aria-label="Publishing overview">
+<div class="admin-stat"><span>Articles saved</span><strong id="statArticles">—</strong><small>Editorial library</small></div>
+<div class="admin-stat"><span>Published</span><strong id="statPublished">—</strong><small>Visible on the website</small></div>
+<div class="admin-stat"><span>Website ads</span><strong id="statAds">—</strong><small>Website placements</small></div>
+</section>
+<section class="website-ad-intro"><div><span class="ad-label">BLAYBRIDGE WEBSITE ONLY</span><h2>Website advertising</h2><p>Create and publish promotions that appear on BlayBridge. Website destination links are allowed; app-store and app-only links are blocked.</p></div><a href="#website-ads">Manage website ads →</a></section>
 <div id="status" class="notice">Checking administrator access...</div>
 
-<section><h2>Homepage wording</h2><p><small>Change the text at the top of the public homepage.</small></p><form id="homepageForm"><label>Small heading</label><input id="homeEyebrow" maxlength="80" required><label>Main heading</label><textarea id="homeTitle" maxlength="180" required></textarea><label>Description</label><textarea id="homeDescription" maxlength="500" required></textarea><label>Button text</label><input id="homeButton" maxlength="60" required><label>Cover background colour</label><input id="homeBackground" type="color" value="#102b60"><label>Cover font colour</label><input id="homeFontColor" type="color" value="#ffffff"><label><input id="homeImageEnabled" type="checkbox" style="width:auto;margin-right:8px">Show uploaded cover picture</label><label>Upload cover picture (JPG, PNG or WebP, maximum 5 MB)</label><input id="homeImageFile" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" id="uploadHero">Upload cover picture</button><p><small id="heroUploadStatus">Choose an image, upload it, then save homepage settings.</small></p><label><input id="homeAdsEnabled" type="checkbox" checked style="width:auto;margin-right:8px">Show Google AdSense advertising spaces (On / Off)</label><label>Cover greeting (bottom-right corner)</label><input id="homeGreeting" maxlength="120" placeholder="Merry Christmas! 🎄"><label><input id="homeGreetingEnabled" type="checkbox" style="width:auto;margin-right:8px"> Show greeting on homepage cover</label><button type="submit">Save homepage settings</button></form></section>
+<section id="homepage-settings"><h2>Homepage wording</h2><p><small>Change the text at the top of the public homepage.</small></p><form id="homepageForm"><label>Small heading</label><input id="homeEyebrow" maxlength="80" required><label>Main heading</label><textarea id="homeTitle" maxlength="180" required></textarea><label>Description</label><textarea id="homeDescription" maxlength="500" required></textarea><label>Button text</label><input id="homeButton" maxlength="60" required><label>Cover background colour</label><input id="homeBackground" type="color" value="#102b60"><label>Cover font colour</label><input id="homeFontColor" type="color" value="#ffffff"><label><input id="homeImageEnabled" type="checkbox" style="width:auto;margin-right:8px">Show uploaded cover picture</label><label>Upload cover picture (JPG, PNG or WebP, maximum 5 MB)</label><input id="homeImageFile" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" id="uploadHero">Upload cover picture</button><p><small id="heroUploadStatus">Choose an image, upload it, then save homepage settings.</small></p><label><input id="homeAdsEnabled" type="checkbox" checked style="width:auto;margin-right:8px">Show Google AdSense advertising spaces (On / Off)</label><label>Cover greeting (bottom-right corner)</label><input id="homeGreeting" maxlength="120" placeholder="Merry Christmas! 🎄"><label><input id="homeGreetingEnabled" type="checkbox" style="width:auto;margin-right:8px"> Show greeting on homepage cover</label><button type="submit">Save homepage settings</button></form></section>
 <section><h2>Homepage Technology Animation</h2><p><small>Upload a short silent looping animation for a separate full-width screen on the homepage. MP4 or WebM, maximum 15 MB. For best results use a clip of 5–15 seconds.</small></p><form id="techForm"><label><input type="checkbox" id="techEnabled" style="width:auto"> Show animation on homepage</label><label>Optional section heading</label><input id="techHeading" maxlength="100" placeholder="Technology in motion"><label>Short video file</label><input type="file" id="techFile" accept="video/mp4,video/webm"><button type="button" id="techUpload">Upload animation</button><p id="techUploadStatus"><small>Upload a video first, then enable and save.</small></p><button type="submit">Save animation settings</button><button type="button" id="removeHomepageVideo" style="background:#9f2435">Remove Homepage Video Permanently</button><p><small>Removes the stored video and turns off homepage animation. This cannot be undone.</small></p></form></section>
 <section><h2>Edit About Us Page</h2><p><small>Update the public About Us page without editing code. Changes go live after saving.</small></p><form id="aboutForm"><label>Page heading</label><input id="aboutHeading" maxlength="120" required><label>Introduction</label><textarea id="aboutIntro" maxlength="2500" required></textarea><label>What we do</label><textarea id="aboutMission" maxlength="2500" required></textarea><label>Our editorial approach</label><textarea id="aboutEditorial" maxlength="2500" required></textarea><label>Get in touch</label><textarea id="aboutContact" maxlength="2500" required></textarea><label>About page picture (HTTPS image URL, optional)</label><input id="aboutPicture" type="url" placeholder="https://example.com/photo.jpg"><button type="submit">Save About Page</button><a href="/about.html" target="_blank" rel="noopener">View About page ↗</a></form></section>
 <section><h2>Edit Contact Us Page</h2><p><small>Manage your public contact details.</small></p><form id="contactForm"><label>Page heading</label><input id="contactHeading" maxlength="120" required><label>Contact message</label><textarea id="contactMessage" maxlength="2500" required></textarea><label>Contact email</label><input id="contactEmail" type="email" maxlength="254" required><label>Additional note</label><textarea id="contactNote" maxlength="1500" required></textarea><button type="submit">Save Contact Page</button><a href="/contact.html" target="_blank" rel="noopener">View Contact page ↗</a></form></section>
-<section><h2>Manage Videos · BlayBridge Media</h2><p><small>Paste a YouTube video link to feature it on the Media page. Published videos are visible to everyone.</small></p><div id="videosAdmin"></div><form id="videoForm"><input type="hidden" id="videoId"><label>YouTube video URL</label><input id="videoUrl" type="url" required placeholder="https://www.youtube.com/watch?v=..."><label>Video title</label><input id="videoTitle" maxlength="160" required><label>Description</label><textarea id="videoDescription" maxlength="600"></textarea><label>Category</label><select id="videoCategory"><option>Digital Products</option><option>Education</option><option>Business</option><option>Technology</option><option>Entertainment</option><option value="__custom__">Custom category — type your own</option></select><label>Custom category name</label><input id="videoCustomCategory" maxlength="80" placeholder="e.g. Scholarships" style="display:none"><label>Product or business link (optional, HTTPS)</label><input id="videoLink" type="url" placeholder="https://example.com"><label>Link button text</label><input id="videoCta" maxlength="40" value="Learn more"><label>Sponsored content?</label><select id="videoSponsored"><option value="no">No</option><option value="yes">Yes — sponsored promotion</option></select><label>Status</label><select id="videoStatus"><option value="draft">Draft</option><option value="published">Published</option></select><button type="submit">Save video</button><button type="button" class="secondary" onclick="resetVideo()">Clear form</button></form></section><section>
+<section><h2>Manage Videos · BlayBridge Media</h2><p><small>Paste a YouTube video link to feature it on the Media page. Published videos are visible to everyone.</small></p><div id="videosAdmin"></div><form id="videoForm"><input type="hidden" id="videoId"><label>YouTube video URL</label><input id="videoUrl" type="url" required placeholder="https://www.youtube.com/watch?v=..."><label>Video title</label><input id="videoTitle" maxlength="160" required><label>Description</label><textarea id="videoDescription" maxlength="600"></textarea><label>Category</label><select id="videoCategory"><option>Digital Products</option><option>Education</option><option>Business</option><option>Technology</option><option>Entertainment</option><option value="__custom__">Custom category — type your own</option></select><label>Custom category name</label><input id="videoCustomCategory" maxlength="80" placeholder="e.g. Scholarships" style="display:none"><label>Product or business link (optional, HTTPS)</label><input id="videoLink" type="url" placeholder="https://example.com"><label>Link button text</label><input id="videoCta" maxlength="40" value="Learn more"><label>Sponsored content?</label><select id="videoSponsored"><option value="no">No</option><option value="yes">Yes — sponsored promotion</option></select><label>Status</label><select id="videoStatus"><option value="draft">Draft</option><option value="published">Published</option></select><button type="submit">Save video</button><button type="button" class="secondary" onclick="resetVideo()">Clear form</button></form></section><section id="article-library">
 <h2>Articles</h2>
 <button onclick="loadPosts()">Refresh articles</button>
 <button onclick="importDrafts()">Import source-linked drafts</button>
 <div id="posts"></div>
 </section>
 
-<section>
+<section id="article-editor">
 <h2>Write or edit article</h2>
 <form id="postForm">
 <input type="hidden" id="postId">
@@ -91,8 +125,9 @@ a{color:#175bd2}
 </form>
 </section>
 
-<section>
-<h2>Personal advertisements</h2>
+<section id="website-ads">
+<h2>Website advertisements</h2>
+<p><small>Promotions appear in the sponsored section on the BlayBridge website only. Use a normal HTTPS website link; app-store links and app-only destinations cannot be published.</small></p>
 <div id="ads"></div>
 <form id="adForm">
 <input type="hidden" id="adId">
@@ -100,8 +135,9 @@ a{color:#175bd2}
 <input id="adTitle" maxlength="120" required>
 <label>Description</label>
 <textarea id="adDescription" maxlength="500" required></textarea>
-<label>Destination URL</label>
+<label>Website destination URL</label>
 <input id="adUrl" type="url" required placeholder="https://example.com">
+<p><small>HTTPS website pages only. Google Play, app stores and app-only destinations are blocked.</small></p>
 <label>Offer image (optional — JPG, PNG or WebP, up to 5 MB)</label>
 <input id="adImage" type="file" accept="image/jpeg,image/png,image/webp">
 <p><small>Images are stored in Cloudflare R2. Configure the OFFERS_BUCKET binding before uploading.</small></p>
@@ -113,7 +149,7 @@ a{color:#175bd2}
 <option value="draft">Draft</option>
 <option value="published">Published</option>
 </select>
-<button type="submit">Save advertisement</button>
+<button type="submit">Save website advertisement</button>
 <button type="button" class="secondary" onclick="resetAd()">Clear form</button>
 </form>
 </section>
@@ -147,6 +183,8 @@ async function loadPosts(){
  try{
   const result=await api('admin/posts');
   posts=result.posts||[];
+  $('statArticles').textContent=posts.length;
+  $('statPublished').textContent=posts.filter(p=>p.status==='published').length;
   $('posts').innerHTML=posts.length?posts.map((p,i)=>`
    <div class="item">
     <strong>${escapeHTML(p.title)}</strong>
@@ -385,6 +423,7 @@ async function loadAds(){
  try{
   const result=await api('admin/ads');
   ads=result.ads||[];
+  $('statAds').textContent=ads.filter(a=>a.status==='published').length;
   $('ads').innerHTML=ads.length?ads.map((a,i)=>`
    <div class="item">
     <strong>${escapeHTML(a.title)}</strong>
@@ -471,7 +510,16 @@ $('removeHomepageVideo').onclick=async()=>{if(!confirm('Permanently remove the h
 $('techForm').onsubmit=async e=>{e.preventDefault();try{await api('admin/tech-settings',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({enabled:$('techEnabled').checked,heading:$('techHeading').value})});alert('Animation settings saved.')}catch(e){alert('Could not save: '+e.message)}};
 async function start(){
  await loadPosts();
- if(authorised){await loadAds();await loadHomepage();await loadVideos();await loadAbout();await loadContact();await loadTech();}
+ if(authorised){
+  try{
+   const synced=await api('admin/sync-editorial',{method:'POST'});
+   await loadPosts();
+   message('Administrator access verified · '+synced.saved+' published stories saved in the article library.');
+  }catch(error){
+   message('Administrator access verified, but editorial sync needs attention: '+error.message);
+  }
+  await loadAds();await loadHomepage();await loadVideos();await loadAbout();await loadContact();await loadTech();
+ }
 }
 start();
 </script>

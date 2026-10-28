@@ -254,8 +254,9 @@ export async function onRequest({ request, env, params }) {
       "SELECT p.id,p.title,p.category,p.excerpt,p.body,p.source_url,p.updated_at,s.value AS cover_json FROM posts p LEFT JOIN site_settings s ON s.key=('post-cover:'||p.id) WHERE p.status='published' ORDER BY p.updated_at DESC LIMIT 100"
     ).all();
 
+    const staticCovers = new Map(EDITORIAL_POSTS.filter(p=>p.cover?.type==='image'&&p.cover.url).map(p=>[p.id,p.cover]));
     const footballSync = await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("football-editorial-synced-v2").first();
-    let posts = results.map(p=>({...p,cover:JSON.parse(p.cover_json||'{}'),cover_json:undefined}));
+    let posts = results.map(p=>{let cover=JSON.parse(p.cover_json||'{}');if((!cover.type||cover.type==='none')&&staticCovers.has(p.id))cover=staticCovers.get(p.id);return {...p,cover,cover_json:undefined}});
     if (!footballSync) {
       const football = EDITORIAL_POSTS.filter(p=>p.category==="Football").map(p=>({
         id:p.id,title:p.title,category:p.category,excerpt:p.excerpt,body:p.body,source_url:p.source_url,

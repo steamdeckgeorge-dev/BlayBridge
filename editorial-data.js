@@ -11,7 +11,9 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T00:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/assets/football-mourinho-cover.jpg",
+      "alt": "José Mourinho watches Real Madrid attack under the Camp Nou floodlights"
     }
   },
   {
@@ -26,7 +28,9 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T00:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/assets/football-kane-cover.jpg",
+      "alt": "An English striker walks toward a floodlit stadium"
     }
   },
   {
@@ -41,7 +45,9 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:30:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/assets/football-el-clasico-cover.jpg",
+      "alt": "Real Madrid breaks forward against Barcelona under the Camp Nou floodlights"
     }
   },
   {

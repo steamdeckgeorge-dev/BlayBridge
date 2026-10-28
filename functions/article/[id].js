@@ -1,15 +1,43 @@
 import { EDITORIAL_POSTS } from "../../editorial-data.js";
-const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export async function onRequestGet({params,env,request}) {
-  const id=String(params.id||'');
-  const curated=EDITORIAL_POSTS.find(item=>item.id===id);
-  let post=curated;
-  if(!post&&env.DB&&/^[0-9a-f-]{36}$/i.test(id))post=await env.DB.prepare("SELECT id,title,excerpt,status,updated_at FROM posts WHERE id=? AND status='published' AND updated_at >= ?").bind(id,"2026-10-28 00:00:00").first();
-  if(!post)return new Response('Article not found',{status:404});
-  const origin=new URL(request.url).origin,canonical=origin+'/article/'+encodeURIComponent(id),home=origin+'/#article='+encodeURIComponent(id);
-  const title=escapeHtml(post.title),description=escapeHtml(post.excerpt||post.title),url=escapeHtml(canonical);
-  const isCrawler=/Twitterbot|facebookexternalhit|Facebot|LinkedInBot|Slackbot|Discordbot|WhatsApp|TelegramBot|Googlebot|bingbot/i.test(request.headers.get('user-agent')||'');
-  const redirectScript=isCrawler?'':`<script>location.replace(${JSON.stringify(home)})</script>`;
-  const html=`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title} | BlayBridge</title><meta name="description" content="${description}"><link rel="canonical" href="${url}"><meta property="og:type" content="article"><meta property="og:site_name" content="BlayBridge"><meta property="og:title" content="${title}"><meta property="og:description" content="${description}"><meta property="og:url" content="${url}"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="${title}"><meta name="twitter:description" content="${description}">${redirectScript}</head><body><main><h1>${title}</h1><p>${description}</p><p><a href="${escapeHtml(home)}">Read this article on BlayBridge</a></p></main></body></html>`;
-  return new Response(html,{headers:{'content-type':'text/html; charset=utf-8','cache-control':'public, max-age=120'}});
+
+const esc=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+
+export async function onRequest(context){
+  const {request,params}=context;
+  const response=await context.next();
+  const type=response.headers.get("content-type")||"";
+  const id=String(params.id||"");
+  if(request.method!=="GET"||!type.includes("text/html")||!/^[a-f0-9-]{36}$/i.test(id))return response;
+  const article=EDITORIAL_POSTS.find(post=>post.id===id);
+  if(!article)return response;
+  const url=new URL("/article/"+encodeURIComponent(id),request.url).href;
+  const image=article.cover?.url?new URL(article.cover.url,request.url).href:"";
+  const title=article.title+" | BlayBridge";
+  const description=article.excerpt||"Read this story on BlayBridge.";
+  const tags=[
+    '<link rel="canonical" href="'+esc(url)+'">',
+    '<meta property="og:type" content="article">',
+    '<meta property="og:site_name" content="BlayBridge">',
+    '<meta property="og:title" content="'+esc(title)+'">',
+    '<meta property="og:description" content="'+esc(description)+'">',
+    '<meta property="og:url" content="'+esc(url)+'">',
+    image?'<meta property="og:image" content="'+esc(image)+'">':'',
+    image?'<meta property="og:image:secure_url" content="'+esc(image)+'">':'',
+    image?'<meta property="og:image:width" content="1200">':'',
+    image?'<meta property="og:image:height" content="630">':'',
+    image?'<meta property="og:image:alt" content="'+esc(article.cover.alt||article.title)+'">':'',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<meta name="twitter:title" content="'+esc(title)+'">',
+    '<meta name="twitter:description" content="'+esc(description)+'">',
+    image?'<meta name="twitter:image" content="'+esc(image)+'">':'',
+    image?'<meta name="twitter:image:alt" content="'+esc(article.cover.alt||article.title)+'">':''
+  ].filter(Boolean).join("");
+  let html=await response.text();
+  html=html.replace(/<title>[\s\S]*?<\/title>/i,"<title>"+esc(title)+"</title>");
+  html=html.replace(/<meta\s+name=["']description["'][^>]*>/i,'<meta name="description" content="'+esc(description)+'">');
+  html=html.replace(/<\/head>/i,tags+"</head>");
+  const headers=new Headers(response.headers);
+  headers.set("content-type","text/html; charset=utf-8");
+  headers.set("cache-control","public, max-age=300");
+  return new Response(html,{status:response.status,statusText:response.statusText,headers});
 }

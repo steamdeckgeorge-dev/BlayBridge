@@ -254,7 +254,16 @@ export async function onRequest({ request, env, params }) {
       "SELECT p.id,p.title,p.category,p.excerpt,p.body,p.source_url,p.updated_at,s.value AS cover_json FROM posts p LEFT JOIN site_settings s ON s.key=('post-cover:'||p.id) WHERE p.status='published' ORDER BY p.updated_at DESC LIMIT 100"
     ).all();
 
-    return json({ posts: results.map(p=>({...p,cover:JSON.parse(p.cover_json||'{}'),cover_json:undefined})) });
+    const footballSync = await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("football-editorial-synced-v1").first();
+    let posts = results.map(p=>({...p,cover:JSON.parse(p.cover_json||'{}'),cover_json:undefined}));
+    if (!footballSync) {
+      const football = EDITORIAL_POSTS.filter(p=>p.category==="Football").map(p=>({
+        id:p.id,title:p.title,category:p.category,excerpt:p.excerpt,body:p.body,source_url:p.source_url,
+        updated_at:p.updated_at||p.published_at,cover:p.cover||{type:"none"}
+      }));
+      posts = [...football,...posts.filter(p=>p.category!=="Football")];
+    }
+    return json({ posts });
   }
 
   // PUBLIC ADVERTISEMENTS
@@ -459,6 +468,24 @@ export async function onRequest({ request, env, params }) {
     ).all();
 
     return json({ posts: results.map(p=>({...p,cover:JSON.parse(p.cover_json||'{}'),cover_json:undefined})) });
+  }
+
+  // One-time Football replacement: archive older published Football entries, then save the new features.
+  if (path === "admin/sync-football" && method === "POST") {
+    const markerKey = "football-editorial-synced-v1";
+    const marker = await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind(markerKey).first();
+    const footballPosts = EDITORIAL_POSTS.filter(post=>post.category==="Football");
+    if (marker) return json({ok:true,saved:footballPosts.length,archived:0,already_synced:true});
+    if (!footballPosts.length) return json({error:"No Football features are configured."},500);
+    const statements = [
+      env.DB.prepare("UPDATE posts SET status='draft',updated_at=datetime('now') WHERE status='published' AND lower(category)='football'"),
+      ...footballPosts.map(post => env.DB.prepare(
+        "INSERT INTO posts (id,title,category,excerpt,body,source_url,status,created_at,updated_at) VALUES (?,?,?,?,?,?,'published',datetime('now'),datetime('now')) ON CONFLICT(id) DO UPDATE SET title=excluded.title,category=excluded.category,excerpt=excluded.excerpt,body=excluded.body,source_url=excluded.source_url,status='published',updated_at=datetime('now')"
+      ).bind(post.id,post.title,post.category,post.excerpt,post.body,post.source_url)),
+      env.DB.prepare("INSERT INTO site_settings(key,value) VALUES (?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value").bind(markerKey)
+    ];
+    const results = await env.DB.batch(statements);
+    return json({ok:true,saved:footballPosts.length,archived:results[0]?.meta?.changes||0});
   }
 
   // One-time admin sync: archive older published rows, then persist this published editorial collection.

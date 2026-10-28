@@ -202,6 +202,21 @@ async function bodyJson(request) {
   }
 }
 
+function isWebsiteOnlyAdUrl(value) {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:") return false;
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    const path = url.pathname.toLowerCase();
+    if (["apps.apple.com", "itunes.apple.com", "market.android.com", "appgallery.huawei.com", "galaxystore.samsung.com", "apps.microsoft.com"].includes(host)) return false;
+    if (host === "play.google.com" && path.startsWith("/store/apps")) return false;
+    if (host === "amazon.com" && (path.startsWith("/gp/mas") || path.startsWith("/android"))) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function onRequest({ request, env, params }) {
   if (!env.DB) {
     return json(
@@ -238,7 +253,7 @@ export async function onRequest({ request, env, params }) {
       "SELECT id,title,description,url,cta,image_url FROM personal_ads WHERE status='published' ORDER BY updated_at DESC LIMIT 12"
     ).all();
 
-    return json({ ads: results });
+    return json({ ads: results.filter(ad=>isWebsiteOnlyAdUrl(ad.url)) });
   }
 
   // Public, non-sensitive app presentation settings.
@@ -351,7 +366,7 @@ export async function onRequest({ request, env, params }) {
       "SELECT * FROM personal_ads ORDER BY updated_at DESC LIMIT 100"
     ).all();
 
-    return json({ ads: results });
+    return json({ ads: results.filter(ad=>isWebsiteOnlyAdUrl(ad.url)) });
   }
 
   // ADMIN: SAVE AD
@@ -374,13 +389,13 @@ export async function onRequest({ request, env, params }) {
       title.length > 120 ||
       !description ||
       description.length > 500 ||
-      !/^https:\/\/[^\s]+$/i.test(url) ||
+      !isWebsiteOnlyAdUrl(url) ||
       url.length > 1000 ||
       !cta ||
       cta.length > 40
     ) {
       return json({
-        error: "Enter a valid title, description, HTTPS link and button label."
+        error: "Enter a title, description, HTTPS website link and button label. App stores and app-only links are not accepted."
       }, 400);
     }
 
@@ -429,6 +444,24 @@ export async function onRequest({ request, env, params }) {
     ).all();
 
     return json({ posts: results.map(p=>({...p,cover:JSON.parse(p.cover_json||'{}'),cover_json:undefined})) });
+  }
+
+  // One-time admin sync: archive older published rows, then persist this published editorial collection.
+  // The marker prevents later dashboard visits from overwriting edits or re-creating deleted items.
+  if (path === "admin/sync-editorial" && method === "POST") {
+    const markerKey = "editorial-library-synced-v1";
+    const marker = await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind(markerKey).first();
+    if (marker) return json({ok:true,saved:EDITORIAL_POSTS.length,created:0,archived:0,already_synced:true});
+    const statements = [
+      env.DB.prepare("UPDATE posts SET status='draft',updated_at=datetime('now') WHERE status='published'"),
+      ...EDITORIAL_POSTS.map(post => env.DB.prepare(
+        "INSERT INTO posts (id,title,category,excerpt,body,source_url,status,created_at,updated_at) VALUES (?,?,?,?,?,?,'published',datetime('now'),datetime('now')) ON CONFLICT(id) DO UPDATE SET title=excluded.title,category=excluded.category,excerpt=excluded.excerpt,body=excluded.body,source_url=excluded.source_url,status='published',updated_at=datetime('now')"
+      ).bind(post.id,post.title,post.category,post.excerpt,post.body,post.source_url)),
+      env.DB.prepare("INSERT INTO site_settings(key,value) VALUES (?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value").bind(markerKey)
+    ];
+    const results = await env.DB.batch(statements);
+    const created = results.slice(1,-1).reduce((total,result)=>total+(result.meta?.changes||0),0);
+    return json({ok:true,saved:EDITORIAL_POSTS.length,created,archived:results[0]?.meta?.changes||0});
   }
 
   if(path.startsWith("admin/article-cover/")&&method==="PUT"){const id=path.slice("admin/article-cover/".length);if(!validId(id))return json({error:"Save article first"},400);const row=await env.DB.prepare("SELECT category FROM posts WHERE id=?").bind(id).first();if(!row||!row.category)return json({error:"Article category required"},400);if(!env.OFFERS_BUCKET)return json({error:"R2 storage unavailable"},503);const type=(request.headers.get("content-type")||"").toLowerCase();if(!["image/jpeg","image/png","image/webp","video/mp4","video/webm"].includes(type))return json({error:"Unsupported cover format"},415);const bytes=await request.arrayBuffer();if(bytes.byteLength>(type.startsWith("video/")?15:5)*1024*1024)return json({error:"Cover too large"},413);await env.OFFERS_BUCKET.put("article-covers/"+id,bytes,{httpMetadata:{contentType:type}});const cover={type:type.startsWith("video/")?"animation":"image"};await env.DB.prepare("INSERT INTO site_settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").bind("post-cover:"+id,JSON.stringify(cover)).run();return json({ok:true,cover})}

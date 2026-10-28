@@ -1,3 +1,5 @@
+import { EDITORIAL_POSTS } from "../../editorial-data.js";
+
 
 const json = (value, status = 200) =>
   new Response(JSON.stringify(value), {
@@ -406,6 +408,18 @@ export async function onRequest({ request, env, params }) {
     ).bind(d.id).run();
 
     return json({ ok: true });
+  }
+
+  // Recoverably replace the current public article collection in one D1 batch.
+  if (path === "admin/refresh-editorial" && method === "POST") {
+    const statements = [
+      env.DB.prepare("UPDATE posts SET status='draft',updated_at=datetime('now') WHERE status='published'"),
+      ...EDITORIAL_POSTS.map(post => env.DB.prepare(
+        "INSERT INTO posts (id,title,category,excerpt,body,source_url,status,created_at,updated_at) VALUES (?,?,?,?,?,?,'published',datetime('now'),datetime('now')) ON CONFLICT(id) DO UPDATE SET title=excluded.title,category=excluded.category,excerpt=excluded.excerpt,body=excluded.body,source_url=excluded.source_url,status='published',updated_at=datetime('now')"
+      ).bind(post.id,post.title,post.category,post.excerpt,post.body,post.source_url))
+    ];
+    const results = await env.DB.batch(statements);
+    return json({ok:true,published:EDITORIAL_POSTS.length,archived:results[0]?.meta?.changes||0});
   }
 
   // ADMIN: LIST ARTICLES

@@ -521,8 +521,8 @@ async function start(){
  await loadPosts();
  if(authorised){
   try{
-   const synced=await api('admin/sync-editorial',{method:'POST',headers:{'content-type':'application/json'},body:'{}'});
-   const football=await api('admin/sync-football',{method:'POST',headers:{'content-type':'application/json'},body:'{}'});
+   const synced=await api('admin/sync-editorial',{method:'POST'});
+   const football=await api('admin/sync-football',{method:'POST'});
    await loadPosts();
    message('Administrator access verified · '+synced.saved+' published stories saved, including '+football.saved+' Football features.');
   }catch(error){

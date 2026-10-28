@@ -202,6 +202,16 @@ async function bodyJson(request) {
   }
 }
 
+const WEBSITE_HOUSE_AD = {
+  id: "b1b2db71-44f6-4d1e-8ff5-7ad07f4b3d04",
+  title: "Keep your curiosity moving",
+  description: "Explore source-linked stories on football, science, technology and AI. Follow a question, learn the details and find your next good read.",
+  url: "https://blaybridge.pages.dev/",
+  cta: "Explore the stories",
+  image_url: null,
+  status: "published"
+};
+
 function isWebsiteOnlyAdUrl(value) {
   try {
     const url = new URL(value);
@@ -253,7 +263,10 @@ export async function onRequest({ request, env, params }) {
       "SELECT id,title,description,url,cta,image_url FROM personal_ads WHERE status='published' ORDER BY updated_at DESC LIMIT 100"
     ).all();
 
-    return json({ ads: results.filter(ad=>isWebsiteOnlyAdUrl(ad.url)).slice(0,12) });
+    const marker = await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("editorial-library-synced-v1").first();
+    const ads = results.filter(ad=>isWebsiteOnlyAdUrl(ad.url));
+    if (!marker && !ads.some(ad=>ad.id===WEBSITE_HOUSE_AD.id)) ads.unshift(WEBSITE_HOUSE_AD);
+    return json({ ads: ads.slice(0,12) });
   }
 
   // Public, non-sensitive app presentation settings.
@@ -432,6 +445,7 @@ export async function onRequest({ request, env, params }) {
       ...EDITORIAL_POSTS.map(post => env.DB.prepare(
         "INSERT INTO posts (id,title,category,excerpt,body,source_url,status,created_at,updated_at) VALUES (?,?,?,?,?,?,'published',datetime('now'),datetime('now')) ON CONFLICT(id) DO UPDATE SET title=excluded.title,category=excluded.category,excerpt=excluded.excerpt,body=excluded.body,source_url=excluded.source_url,status='published',updated_at=datetime('now')"
       ).bind(post.id,post.title,post.category,post.excerpt,post.body,post.source_url)),
+      env.DB.prepare("INSERT INTO personal_ads (id,title,description,url,cta,status) VALUES (?,?,?,?,?,'published') ON CONFLICT(id) DO NOTHING").bind(WEBSITE_HOUSE_AD.id,WEBSITE_HOUSE_AD.title,WEBSITE_HOUSE_AD.description,WEBSITE_HOUSE_AD.url,WEBSITE_HOUSE_AD.cta),
       env.DB.prepare("INSERT INTO site_settings(key,value) VALUES ('editorial-library-synced-v1',datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value")
     ];
     const results = await env.DB.batch(statements);
@@ -458,6 +472,7 @@ export async function onRequest({ request, env, params }) {
       ...EDITORIAL_POSTS.map(post => env.DB.prepare(
         "INSERT INTO posts (id,title,category,excerpt,body,source_url,status,created_at,updated_at) VALUES (?,?,?,?,?,?,'published',datetime('now'),datetime('now')) ON CONFLICT(id) DO UPDATE SET title=excluded.title,category=excluded.category,excerpt=excluded.excerpt,body=excluded.body,source_url=excluded.source_url,status='published',updated_at=datetime('now')"
       ).bind(post.id,post.title,post.category,post.excerpt,post.body,post.source_url)),
+      env.DB.prepare("INSERT INTO personal_ads (id,title,description,url,cta,status) VALUES (?,?,?,?,?,'published') ON CONFLICT(id) DO NOTHING").bind(WEBSITE_HOUSE_AD.id,WEBSITE_HOUSE_AD.title,WEBSITE_HOUSE_AD.description,WEBSITE_HOUSE_AD.url,WEBSITE_HOUSE_AD.cta),
       env.DB.prepare("INSERT INTO site_settings(key,value) VALUES (?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value").bind(markerKey)
     ];
     const results = await env.DB.batch(statements);

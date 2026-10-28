@@ -250,10 +250,10 @@ export async function onRequest({ request, env, params }) {
   // PUBLIC ADVERTISEMENTS
   if (path === "ads" && method === "GET") {
     const { results } = await env.DB.prepare(
-      "SELECT id,title,description,url,cta,image_url FROM personal_ads WHERE status='published' ORDER BY updated_at DESC LIMIT 12"
+      "SELECT id,title,description,url,cta,image_url FROM personal_ads WHERE status='published' ORDER BY updated_at DESC LIMIT 100"
     ).all();
 
-    return json({ ads: results.filter(ad=>isWebsiteOnlyAdUrl(ad.url)) });
+    return json({ ads: results.filter(ad=>isWebsiteOnlyAdUrl(ad.url)).slice(0,12) });
   }
 
   // Public, non-sensitive app presentation settings.
@@ -431,7 +431,8 @@ export async function onRequest({ request, env, params }) {
       env.DB.prepare("UPDATE posts SET status='draft',updated_at=datetime('now') WHERE status='published'"),
       ...EDITORIAL_POSTS.map(post => env.DB.prepare(
         "INSERT INTO posts (id,title,category,excerpt,body,source_url,status,created_at,updated_at) VALUES (?,?,?,?,?,?,'published',datetime('now'),datetime('now')) ON CONFLICT(id) DO UPDATE SET title=excluded.title,category=excluded.category,excerpt=excluded.excerpt,body=excluded.body,source_url=excluded.source_url,status='published',updated_at=datetime('now')"
-      ).bind(post.id,post.title,post.category,post.excerpt,post.body,post.source_url))
+      ).bind(post.id,post.title,post.category,post.excerpt,post.body,post.source_url)),
+      env.DB.prepare("INSERT INTO site_settings(key,value) VALUES ('editorial-library-synced-v1',datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value")
     ];
     const results = await env.DB.batch(statements);
     return json({ok:true,published:EDITORIAL_POSTS.length,archived:results[0]?.meta?.changes||0});

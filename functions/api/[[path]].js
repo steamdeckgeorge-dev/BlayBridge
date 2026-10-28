@@ -206,7 +206,7 @@ const WEBSITE_HOUSE_AD = {
   id: "b1b2db71-44f6-4d1e-8ff5-7ad07f4b3d04",
   title: "Keep your curiosity moving",
   description: "Explore source-linked stories on football, science, technology and AI. Follow a question, learn the details and find your next good read.",
-  url: "https://blaybridge.pages.dev/",
+  url: "https://blaybridge.pages.dev/#stories",
   cta: "Explore the stories",
   image_url: null,
   status: "published"
@@ -266,7 +266,7 @@ export async function onRequest({ request, env, params }) {
     const marker = await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("editorial-library-synced-v1").first();
     const ads = results.filter(ad=>isWebsiteOnlyAdUrl(ad.url));
     if (!marker && !ads.some(ad=>ad.id===WEBSITE_HOUSE_AD.id)) ads.unshift(WEBSITE_HOUSE_AD);
-    return json({ ads: ads.slice(0,12) });
+    return json({ ads: ads.slice(0,12), configured: !!marker });
   }
 
   // Public, non-sensitive app presentation settings.

@@ -254,7 +254,7 @@ export async function onRequest({ request, env, params }) {
       "SELECT p.id,p.title,p.category,p.excerpt,p.body,p.source_url,p.updated_at,s.value AS cover_json FROM posts p LEFT JOIN site_settings s ON s.key=('post-cover:'||p.id) WHERE p.status='published' ORDER BY p.updated_at DESC LIMIT 100"
     ).all();
 
-    const footballSync = await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("football-editorial-synced-v1").first();
+    const footballSync = await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("football-editorial-synced-v2").first();
     let posts = results.map(p=>({...p,cover:JSON.parse(p.cover_json||'{}'),cover_json:undefined}));
     if (!footballSync) {
       const football = EDITORIAL_POSTS.filter(p=>p.category==="Football").map(p=>({
@@ -472,7 +472,7 @@ export async function onRequest({ request, env, params }) {
 
   // One-time Football replacement: archive older published Football entries, then save the new features.
   if (path === "admin/sync-football" && method === "POST") {
-    const markerKey = "football-editorial-synced-v1";
+    const markerKey = "football-editorial-synced-v2";
     const marker = await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind(markerKey).first();
     const footballPosts = EDITORIAL_POSTS.filter(post=>post.category==="Football");
     if (marker) return json({ok:true,saved:footballPosts.length,archived:0,already_synced:true});

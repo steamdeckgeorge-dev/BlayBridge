@@ -513,8 +513,9 @@ async function start(){
  if(authorised){
   try{
    const synced=await api('admin/sync-editorial',{method:'POST'});
+   const football=await api('admin/sync-football',{method:'POST'});
    await loadPosts();
-   message('Administrator access verified · '+synced.saved+' published stories saved in the article library.');
+   message('Administrator access verified · '+synced.saved+' editorial stories and '+football.saved+' Football features saved in the article library.');
   }catch(error){
    message('Administrator access verified, but editorial sync needs attention: '+error.message);
   }

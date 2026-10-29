@@ -256,7 +256,7 @@ export async function onRequest({ request, env, params }) {
 
     const staticCovers = new Map(EDITORIAL_POSTS.filter(p=>p.cover?.type==='image'&&p.cover.url).map(p=>[p.id,p.cover]));
     const footballSync = await env.DB.prepare("SELECT value FROM site_settings WHERE key=?").bind("football-editorial-synced-v2").first();
-    let posts = results.map(p=>{let cover=JSON.parse(p.cover_json||'{}');if((!cover.type||cover.type==='none')&&staticCovers.has(p.id))cover=staticCovers.get(p.id);return {...p,cover,cover_json:undefined}});
+    let posts = results.map(p=>{let cover=JSON.parse(p.cover_json||'{}');if(staticCovers.has(p.id)&&(!cover.type||cover.type==='none'||(cover.type==='image'&&!cover.url)))cover=staticCovers.get(p.id);return {...p,cover,cover_json:undefined}});
     if (!footballSync) {
       const football = EDITORIAL_POSTS.filter(p=>p.category==="Football").map(p=>({
         id:p.id,title:p.title,category:p.category,excerpt:p.excerpt,body:p.body,source_url:p.source_url,

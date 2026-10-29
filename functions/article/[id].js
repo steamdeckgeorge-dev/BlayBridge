@@ -28,10 +28,10 @@ export async function onRequest(context){
   if(!article)return response;
   const url=new URL("/article/"+encodeURIComponent(id),request.url).href;
   let image="";
-  if(cover&&["image","animation","custom"].includes(cover.type)){
-    image=new URL("/api/article-cover/"+encodeURIComponent(id),request.url).href;
-  }else if(cover?.url){
+  if(cover?.url&&["image","animation","custom"].includes(cover.type)){
     image=new URL(cover.url,request.url).href;
+  }else if(cover&&["image","animation","custom"].includes(cover.type)){
+    image=new URL("/api/article-cover/"+encodeURIComponent(id),request.url).href;
   }
   const title=article.title+" | BlayBridge";
   const description=article.excerpt||"Read this story on BlayBridge.";

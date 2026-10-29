@@ -19,7 +19,7 @@ export async function onRequest(context){
     ).bind(id).first();
     if(row){
       article={...article,...row};
-      try{cover=JSON.parse(row.cover_json||"{}")}catch{cover={}}
+      try{cover=JSON.parse(row.cover_json||"{}");if(!cover.url&&article?.cover?.url)cover=article.cover}catch{cover=article?.cover||{}}
     }else if(!article){
       return response;
     }

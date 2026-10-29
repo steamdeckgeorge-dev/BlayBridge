@@ -409,5 +409,11 @@ export const EDITORIAL_POSTS = [
       "type": "none"
     },
     "published_at": "2026-10-28"
+  },
+  {
+    "id": "90d3a17d-8be6-450b-8c23-154c98758d6a",
+    "category": "Entertainment",
+    "title": "Dexter Returns to New York With Two New Predators",
+    "cover": { "type": "image", "url": "/images/dexter-resurrection-thumbnail.webp" }
   }
 ];

@@ -429,7 +429,7 @@ export const EDITORIAL_POSTS = [
     "date": "30 October 2026",
     "cover": {
       "type": "image",
-      "url": "/images/binance-security-incident-2026.jpg",
+      "url": "/images/binance-security-incident-2026.webp",
       "alt": "A data centre with a restrained red security alert and abstract digital asset network graphics"
     }
   }

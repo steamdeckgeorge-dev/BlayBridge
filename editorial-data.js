@@ -415,5 +415,22 @@ export const EDITORIAL_POSTS = [
     "category": "Entertainment",
     "title": "Dexter Returns to New York With Two New Predators",
     "cover": { "type": "image", "url": "/images/dexter-resurrection-thumbnail-v2.webp?rev=0b90b261" }
+  },
+  {
+    "id": "crypto-binance-security-incident-2026-10",
+    "category": "Technology",
+    "title": "The Binance Breach and the $6.3 Billion Question",
+    "excerpt": "Binance says a security incident had an estimated impact of $6.3 billion. The response raises questions about exchange security, frozen assets and who bears the loss.",
+    "body": "Binance says it will cover losses after a security incident affected an estimated $6.3 billion in digital assets. The investigation is still under way.\n\nOn October 29, a security incident at Binance sent shockwaves through the cryptocurrency market. The exchange later put the estimated impact at about $6.3 billion. Blockchain intelligence firm TRM said an attacker moved roughly $6.36 billion from Binance wallets across ten blockchains. If confirmed, that would make it the largest crypto theft on record.\n\nBinance’s preliminary investigation points to a possible compromise of a DevOps engineer’s laptop. The company says this may have given an attacker access to a service container and allowed unauthorised withdrawal transactions. Binance says it has found no evidence that wallet private keys were leaked. A full technical account has not yet been released.\n\nThe exchange says about $3 billion in affected assets has been frozen with help from blockchain partners. It has pledged to cover all losses using its Secure Asset Fund for Users and company funds. Customers and the wider market will be watching for more detail about how the breach happened and how much can be recovered.\n\nTRM attributed the attack to TraderTraitor, a North Korean hacking unit, with what it called high confidence. Chainalysis also said the attack was likely linked to the group. Binance has not confirmed who was responsible and says it is working with law enforcement to identify the criminals.\n\nThe incident is a reminder that crypto security depends on more than the technology behind a coin. It also depends on the systems, people and approval processes used by companies that hold and move digital assets. When an exchange is breached, the consequences can reach far beyond one platform.\n\nBinance says user funds are safe and has promised an updated proof of reserves after its remediation work is complete. The investigation will need to show how that assurance is supported and what changes will help prevent a similar incident.\n\nIf billions can move before a breach is stopped, what should customers expect from the companies trusted to hold their crypto?",
+    "source_url": "https://www.binance.com/en-TR/support/announcement/detail/c5a8729a97ac486d963784d96c5642d7\nhttps://apnews.com/article/binance-cryptocurrency-security-hack-north-korea-550e9b876550f71f07098494fe735beb",
+    "published_at": "2026-10-30",
+    "created_at": "2026-10-30T10:50:00Z",
+    "updated_at": "2026-10-30T10:50:00Z",
+    "date": "30 October 2026",
+    "cover": {
+      "type": "image",
+      "url": "/images/binance-security-incident-2026.jpg",
+      "alt": "A data centre with a restrained red security alert and abstract digital asset network graphics"
+    }
   }
 ];

@@ -7,7 +7,7 @@ export async function onRequest(context){
   const response=await context.next();
   const type=response.headers.get("content-type")||"";
   const id=String(params.id||"");
-  if(request.method!=="GET"||!type.includes("text/html")||!/^[a-f0-9-]{36}$/i.test(id))return response;
+  if(request.method!=="GET"||!type.includes("text/html")||!/^[a-z0-9][a-z0-9-]{0,79}$/i.test(id))return response;
 
   let article=EDITORIAL_POSTS.find(post=>post.id===id);
   let cover=article?.cover||null;

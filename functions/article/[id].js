@@ -9,7 +9,7 @@ export async function onRequest(context){
   const id=String(params.id||"");
   if(request.method!=="GET"||!type.includes("text/html")||!/^[a-z0-9][a-z0-9-]{0,79}$/i.test(id))return response;
 
-  let article=EDITORIAL_POSTS.find(post=>post.id===id);
+  let article=EDITORIAL_POSTS.find(post=>post.id===id||post.legacy_ids?.includes(id));
   let cover=article?.cover||null;
 
   // Public stories are stored in D1, so resolve them server-side for social crawlers.
@@ -26,10 +26,10 @@ export async function onRequest(context){
   }
 
   if(!article)return response;
-  const url=new URL("/article/"+encodeURIComponent(id),request.url).href;
+  const url=new URL("/article/"+encodeURIComponent(article.id),request.url).href;
   let image="";
   if(cover?.url&&["image","animation","custom"].includes(cover.type)){
-    image=new URL(cover.url,request.url).href;
+    image=new URL(cover.social_url||cover.url,request.url).href;
   }else if(cover&&["image","animation","custom"].includes(cover.type)){
     image=new URL("/api/article-cover/"+encodeURIComponent(id),request.url).href;
   }

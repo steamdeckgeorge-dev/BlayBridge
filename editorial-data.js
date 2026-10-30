@@ -417,7 +417,8 @@ export const EDITORIAL_POSTS = [
     "cover": { "type": "image", "url": "/images/dexter-resurrection-thumbnail-v2.webp?rev=0b90b261" }
   },
   {
-    "id": "crypto-binance-security-incident-2026-10",
+    "id": "7d04a89b-8bd9-4d42-95de-b8d6e32d7b91",
+    "legacy_ids": ["crypto-binance-security-incident-2026-10"],
     "category": "Technology",
     "title": "The Binance Breach and the $6.3 Billion Question",
     "excerpt": "Binance says a security incident had an estimated impact of $6.3 billion. The response raises questions about exchange security, frozen assets and who bears the loss.",
@@ -430,6 +431,7 @@ export const EDITORIAL_POSTS = [
     "cover": {
       "type": "image",
       "url": "/images/binance-security-incident-2026.webp",
+      "social_url": "/images/binance-security-incident-2026.jpg",
       "alt": "A data centre with a restrained red security alert and abstract digital asset network graphics"
     }
   }

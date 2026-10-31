@@ -247,7 +247,7 @@ async function loadHomepageText(){try{const r=await fetch("/api/site-content",{c
   let src='';
   if(cover.type==='custom'&&article.id&&cover.media!=='animation')src='/api/article-cover/'+encodeURIComponent(article.id);
   else if(cover.type==='image'&&typeof cover.url==='string'){
-   if(/^\\/assets\\/[a-z0-9-]+\\.jpg$/i.test(cover.url)||/^\\/images\\/[a-z0-9-]+\\.webp(?:\\?[^"']*)?$/i.test(cover.url)||/^https:\\/\\//i.test(cover.url))src=cover.url;
+   if(/^\/assets\/[a-z0-9-]+\.jpg$/i.test(cover.url)||/^\/images\/[a-z0-9-]+\.webp(?:\?[^"']*)?$/i.test(cover.url)||/^https:\/\//i.test(cover.url))src=cover.url;
    else if(article.id)src='/api/article-cover/'+encodeURIComponent(article.id);
   }
   if(src){

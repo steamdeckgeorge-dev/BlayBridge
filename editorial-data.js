@@ -62,7 +62,9 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-ent-chorus.webp",
+      "alt": "A commuter listening to music on a city train at dusk"
     }
   },
   {
@@ -76,7 +78,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A sound artist creating movie effects with everyday objects in a recording studio.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -91,7 +94,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A person watching television late at night in a dark living room.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -106,7 +110,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A smartphone navigation map with GPS satellites above Earth.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -121,7 +126,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-Disassembled smartphone components and recovered materials arranged on a workbench.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -136,7 +142,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A customer scanning a QR code at a cafe.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -151,7 +158,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-The planet Venus and the Sun viewed from space.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -166,7 +174,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A tardigrade among moss viewed through a microscope.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -181,7 +190,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-An octopus moving through a blue underwater reef.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -196,7 +206,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A person under a spotlight at a social gathering with the crowd softly blurred.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -211,7 +222,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-An open storybook beside a plain checklist in a warm library.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -226,7 +238,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A woman relaxing beside a bright window with tea and a closed laptop.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -241,7 +254,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A researcher checking a polished AI answer against a source book.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -256,7 +270,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A researcher verifying a printed academic citation with a magnifying glass.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -271,7 +286,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A writer editing a draft on a laptop with a pen and notebook.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -286,7 +302,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A researcher comparing printed sources and a laptop in a library.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -301,7 +318,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-Hands building a simple one-page website on a laptop.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -316,7 +334,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-An office worker reviewing a spreadsheet with neat charts on a laptop.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -331,7 +350,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A person unlocking a phone with a fingerprint sensor.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -346,7 +366,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A person reviewing privacy permission toggles on a smartphone.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -361,7 +382,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A person hesitating before opening a suspicious message on a phone.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -376,7 +398,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A distant galaxy cluster and gravitational lensing arcs resembling a treble clef.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -391,7 +414,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A stellar nursery with newborn stars behind colorful clouds of dust.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -406,7 +430,8 @@ export const EDITORIAL_POSTS = [
     "updated_at": "2026-10-28T12:00:00Z",
     "date": "28 October 2026",
     "cover": {
-      "type": "none"
+      "type": "image",
+      "url": "/images/cover-A physicist studying deep-space radio signals at an observatory.webp"
     },
     "published_at": "2026-10-28"
   },
@@ -414,11 +439,16 @@ export const EDITORIAL_POSTS = [
     "id": "90d3a17d-8be6-450b-8c23-154c98758d6a",
     "category": "Entertainment",
     "title": "Dexter Returns to New York With Two New Predators",
-    "cover": { "type": "image", "url": "/images/dexter-resurrection-thumbnail-v2.webp?rev=0b90b261" }
+    "cover": {
+      "type": "image",
+      "url": "/images/dexter-resurrection-thumbnail-v2.webp?rev=0b90b261"
+    }
   },
   {
     "id": "7d04a89b-8bd9-4d42-95de-b8d6e32d7b91",
-    "legacy_ids": ["crypto-binance-security-incident-2026-10"],
+    "legacy_ids": [
+      "crypto-binance-security-incident-2026-10"
+    ],
     "category": "Technology",
     "title": "The Binance Breach and the $6.3 Billion Question",
     "excerpt": "Binance says a security incident had an estimated impact of $6.3 billion. The response raises questions about exchange security, frozen assets and who bears the loss.",

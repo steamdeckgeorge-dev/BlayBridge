@@ -168,7 +168,7 @@ async function loadHomepageText(){try{const r=await fetch("/api/site-content",{c
   time.className='read-time';
   time.textContent=readingTime(article);
   meta.append(pill,time);
-  if(article.date){const date=document.createElement('span');date.className='muted';date.textContent=article.date;meta.append(date)}
+  if(article.date){const date=document.createElement('span');date.className='muted';const parsedDate=articleDate(article);date.textContent=parsedDate?parsedDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):article.date;meta.append(date)}
   parent.appendChild(meta);
  }
  function addOpenButton(parent,id){

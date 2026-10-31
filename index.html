@@ -278,7 +278,7 @@ async function loadHomepageText(){try{const r=await fetch("/api/site-content",{c
   const button=document.createElement('button');
   button.type='button';
   button.textContent='Open in full reader';
-  button.addEventListener('click',function(){openArticleById(id,true)});
+  button.addEventListener('click',function(){if(openArticleById(id,true)){rememberArticleId(id);history.pushState(null,'',shareArticleUrl(id))}});
   actions.appendChild(button);
   parent.appendChild(actions);
  }

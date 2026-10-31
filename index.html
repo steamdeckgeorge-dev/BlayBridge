@@ -82,6 +82,13 @@
 .home-latest-skeleton:first-child{border-top:0;padding-top:3px}
 .home-latest-skeleton .home-skeleton-visual{margin-bottom:12px}
 @media(max-width:560px){.home-feature-skeleton .home-skeleton-visual{height:170px}.home-feature-skeleton .home-feature-body{padding:20px}}
+
+.home-article-thumb-wrap{width:104px;height:64px;margin:13px 0 12px;overflow:hidden;border-radius:9px;background:#0b2340;box-shadow:0 2px 8px #10213a18}
+.home-article-thumb{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.home-article-thumb-wrap .visual.category-artwork{width:100%;height:100%;min-height:0;margin:0;border-radius:0}
+.home-article-thumb-wrap .art-label{font-size:6px;letter-spacing:1px}
+.home-article-thumb-wrap .cat-art svg{width:38px!important;height:38px!important}
+.home-latest-item .home-article-thumb-wrap{width:78px;height:48px;margin:8px 0 10px}
 </style><style id="newsdesk-homepage-2026">
 .top-stories-strip{background:#eaf3ff;border-top:3px solid #2867ef;border-bottom:1px solid #d1e3f8}
 .top-stories-strip .wrap{display:flex;align-items:center;gap:12px;padding-top:9px;padding-bottom:9px}
@@ -226,6 +233,35 @@ async function loadHomepageText(){try{const r=await fetch("/api/site-content",{c
   if(article.date){const date=document.createElement('span');date.className='muted';const parsedDate=articleDate(article);date.textContent=parsedDate?parsedDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):article.date;meta.append(date)}
   parent.appendChild(meta);
  }
+ function addThumbnail(parent,article,size){
+  const wrap=document.createElement('div');
+  wrap.className='home-article-thumb-wrap home-article-thumb-'+size;
+  wrap.setAttribute('aria-hidden','true');
+  function fallback(){
+   wrap.replaceChildren();
+   const holder=document.createElement('div');
+   holder.innerHTML=articleVisual(article.category,article);
+   if(holder.firstElementChild)wrap.appendChild(holder.firstElementChild);
+  }
+  const cover=article.cover||{};
+  let src='';
+  if(cover.type==='custom'&&article.id&&cover.media!=='animation')src='/api/article-cover/'+encodeURIComponent(article.id);
+  else if(cover.type==='image'&&typeof cover.url==='string'){
+   if(/^\\/assets\\/[a-z0-9-]+\\.jpg$/i.test(cover.url)||/^\\/images\\/[a-z0-9-]+\\.webp(?:\\?[^"']*)?$/i.test(cover.url)||/^https:\\/\\//i.test(cover.url))src=cover.url;
+   else if(article.id)src='/api/article-cover/'+encodeURIComponent(article.id);
+  }
+  if(src){
+   const image=document.createElement('img');
+   image.className='home-article-thumb';
+   image.alt='';
+   image.loading='lazy';
+   image.decoding='async';
+   image.src=src;
+   image.addEventListener('error',fallback,{once:true});
+   wrap.appendChild(image);
+  }else fallback();
+  parent.appendChild(wrap);
+ }
  function addOpenButton(parent,id){
   const actions=document.createElement('div');
   actions.className='home-feature-actions';
@@ -252,6 +288,7 @@ async function loadHomepageText(){try{const r=await fetch("/api/site-content",{c
   const body=document.createElement('div');
   body.className='home-feature-body';
   addMeta(body,main);
+  addThumbnail(body,main,'feature');
   const title=document.createElement('h3');
   title.textContent=main.title;
   body.appendChild(title);
@@ -266,6 +303,7 @@ async function loadHomepageText(){try{const r=await fetch("/api/site-content",{c
    item.className='home-latest-item';
    item.innerHTML=articleVisual(article.category,article);
    addMeta(item,article);
+   addThumbnail(item,article,'latest');
    const heading=document.createElement('h4');
    heading.textContent=article.title;
    item.appendChild(heading);

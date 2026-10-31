@@ -27,7 +27,12 @@
 .home-reading-heading p{margin:0;color:#61738e}
 .home-reading-layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:20px;align-items:start}
 .home-feature,.home-latest-panel{background:#fff;border:1px solid #e0e9f5;border-radius:20px;box-shadow:0 12px 34px #19385d0c;overflow:hidden}
-.home-feature .visual.category-artwork{height:210px}
+.home-feature .visual.category-artwork{height:210px}.home-feature .visual.category-artwork,.home-latest-item .visual.category-artwork{position:relative;isolation:isolate;overflow:hidden;display:block;background:#091c3d;color:#b9eaff}
+.home-feature .visual.category-artwork::before,.home-latest-item .visual.category-artwork::before{content:"";position:absolute;inset:0;z-index:-2;background:radial-gradient(circle at 68% 22%,var(--glow),transparent 50%),linear-gradient(145deg,var(--tone),#051229 90%)}
+.home-feature .visual.category-artwork::after,.home-latest-item .visual.category-artwork::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,transparent 25%,#04112c99 63%,#04112cf5 100%)}
+.home-feature .visual.category-artwork .cat-art,.home-latest-item .visual.category-artwork .cat-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:none}
+.home-feature .visual.category-artwork .cat-art svg{width:112px;height:112px}
+.home-latest-item .visual.category-artwork .cat-art svg{width:62px;height:62px}
 .home-feature-body{padding:clamp(20px,3vw,32px)}
 .home-feature h3{font:700 clamp(27px,3.4vw,38px)/1.14 Georgia,serif;letter-spacing:-.5px;margin:13px 0}
 .home-feature-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -146,7 +151,8 @@ async function loadHomepageText(){try{const r=await fetch("/api/site-content",{c
   nodes.slice(0,visibleCount).forEach(node=>opening.appendChild(node));
   if(!nodes.length&&article.excerpt){const p=document.createElement('p');p.textContent=article.excerpt;opening.appendChild(p)}
   parent.appendChild(opening);
-  if(nodes.length>visibleCount){
+  const sourceMarkup=renderArticleSources(article);
+  if(nodes.length>visibleCount||sourceMarkup){
    const details=document.createElement('details');
    details.className='home-read-details';
    const summary=document.createElement('summary');
@@ -154,6 +160,7 @@ async function loadHomepageText(){try{const r=await fetch("/api/site-content",{c
    const full=document.createElement('div');
    full.className='home-full-copy';
    nodes.slice(visibleCount).forEach(node=>full.appendChild(node));
+   if(sourceMarkup){const sources=document.createElement('div');sources.innerHTML=sourceMarkup;if(sources.firstElementChild)full.appendChild(sources.firstElementChild)}
    details.append(summary,full);
    parent.appendChild(details);
   }
@@ -201,9 +208,6 @@ async function loadHomepageText(){try{const r=await fetch("/api/site-content",{c
   body.appendChild(title);
   if(main.excerpt){const deck=document.createElement('p');deck.className='home-feature-deck';deck.textContent=main.excerpt;body.appendChild(deck)}
   appendArticleText(body,main,3);
-  const sources=document.createElement('div');
-  sources.innerHTML=renderArticleSources(main);
-  if(sources.firstElementChild)body.appendChild(sources.firstElementChild);
   addOpenButton(body,main.id);
   card.appendChild(body);
   feature.appendChild(card);

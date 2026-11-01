@@ -464,5 +464,23 @@ export const EDITORIAL_POSTS = [
       "social_url": "/images/binance-security-incident-2026.jpg",
       "alt": "A data centre with a restrained red security alert and abstract digital asset network graphics"
     }
+  },
+  {
+    "id": "5f40371e-084f-44d8-b5e6-93cb6a94f0ab",
+    "category": "Science",
+    "title": "Why Some Men Can Go Again After Ejaculating While Others Need Hours",
+    "excerpt": "Some men feel ready for sex again soon after ejaculation while others need hours. The difference often comes down to the body’s recovery period.",
+    "body": "One man ejaculates, takes a short pause and feels ready to have sex again. Another may still want intimacy but find that his body needs hours before it responds. That difference is usually about recovery time, not a simple measure of stamina or desire.\n\nAfter ejaculation, many men experience a refractory period. During this time it may be difficult or temporarily impossible to get another erection or reach another orgasm. The pause may be brief for one man and last much longer for another. Researchers still do not fully understand why the timing varies so much.\n\nAfter orgasm the body begins to settle. A man may feel relaxed or tired, lose his erection or find that stimulation does not bring the same response straight away. His desire may return before his body is ready for another round. That does not necessarily mean he is less attracted to his partner. His body may simply need more time.\n\nAge can influence recovery. Some men find that they need longer as they get older, though age does not explain every difference. Men of the same age can have very different experiences and there is no single recovery time that applies to everyone.\n\nEnergy, stress, general health and the circumstances around sex may also affect how ready someone feels. Some medicines and health conditions can affect erections and sexual response. Still, taking longer to recover does not automatically mean something is wrong. Sometimes the body just needs a longer pause.\n\nMen who seem ready to go again quickly may not all be describing the same thing. One man may regain an erection soon after ejaculation. Another may continue being intimate but need longer before he can orgasm again. Erection, orgasm and ejaculation are connected but they are not identical experiences.\n\nStories about repeated sex can leave out the pauses or make different experiences sound the same. Comparing yourself with someone else’s account may create pressure without telling you what is normal for your own body.\n\nNeeding time to recover is usually a normal part of sexual response. If you notice a sudden or persistent change that worries you, ongoing difficulty getting or keeping an erection, pain or another symptom affecting your sex life, speak with a healthcare professional.\n\nSome men are ready again quickly and others need more time. Neither timing by itself proves greater masculinity, stronger desire or better sexual health. Bodies have different rhythms and a pause after ejaculation is a normal one.",
+    "source_url": "https://www.issm.info/sexual-health-qa/what-is-the-refractory-period\nhttps://pubmed.ncbi.nlm.nih.gov/19515210/\nhttps://my.clevelandclinic.org/health/articles/9119-sexual-response-cycle",
+    "published_at": "2026-11-01",
+    "created_at": "2026-11-01T17:40:00Z",
+    "updated_at": "2026-11-01T17:40:00Z",
+    "date": "1 November 2026",
+    "cover": {
+      "type": "image",
+      "url": "/images/refractory-period-recovery-2026.webp",
+      "social_url": "/images/refractory-period-recovery-2026.jpg",
+      "alt": "Two adult men shown at different stages of recovery after ejaculation"
+    }
   }
 ];

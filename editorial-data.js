@@ -489,7 +489,7 @@ export const EDITORIAL_POSTS = [
     "title": "One Network, Millions of Customers, Too Little Choice",
     "cover": {
       "type": "image",
-      "url": "/images/network-market-power.jpg",
+      "url": "/images/network-market-power.webp",
       "alt": "A digital network map with one dominant golden node and smaller competing nodes"
     }
   }

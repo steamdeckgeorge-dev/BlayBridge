@@ -482,5 +482,15 @@ export const EDITORIAL_POSTS = [
       "social_url": "/images/refractory-period-recovery-2026.jpg",
       "alt": "Two adult men shown at different stages of recovery after ejaculation"
     }
+  },
+  {
+    "id": "0bdf5c5d-7de6-478c-a736-cf3c54dffa20",
+    "category": "Technology",
+    "title": "One Network, Millions of Customers, Too Little Choice",
+    "cover": {
+      "type": "image",
+      "url": "/images/network-market-power.jpg",
+      "alt": "A digital network map with one dominant golden node and smaller competing nodes"
+    }
   }
 ];

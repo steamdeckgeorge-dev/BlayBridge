@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Play Word Ladder on BlayBridge. Change one letter at a time to connect two words.">
+<title>Word Ladder | BlayBridge</title>
+<style>
+:root{--ink:#15243c;--blue:#2867ef;--blue-dark:#174ba8;--navy:#10213e;--gold:#e7bd57;--bg:#f4f7fc;--line:#e1e9f4;--muted:#6c7890;--green:#23764b;--red:#b52e39;--shadow:0 12px 35px #163a6b0b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.wrap{max-width:1160px;margin:auto;padding:0 20px}
+header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 5px 20px #0d234008}.bar{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;padding:13px 0}.logo{font-weight:900;font-size:24px;letter-spacing:-1.2px;white-space:nowrap}.logo span{color:var(--blue)}nav{display:flex;align-items:center;gap:8px 17px;flex-wrap:wrap}nav a{font-size:12px;font-weight:750;color:#36445a}nav a:hover,nav a[aria-current=page]{color:var(--blue)}
+.hero{background:radial-gradient(circle at 84% 22%,#4184ff72,transparent 36%),linear-gradient(120deg,#091a37,#174a92);color:white;padding:36px 0}.hero-inner{display:flex;align-items:center;justify-content:space-between;gap:25px}.eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:900;color:#c6d9ff}.hero h1{font-size:clamp(34px,5vw,50px);line-height:1.08;letter-spacing:-1.5px;margin:8px 0}.hero p{max-width:680px;color:#dbe7fb;margin:0}.hero-mark{width:76px;height:76px;border:1px solid #ffffff44;border-radius:23px;display:grid;place-items:center;background:linear-gradient(145deg,#ffffff2a,#ffffff0c);font-size:27px;font-weight:900}
+main{max-width:1160px;margin:25px auto 50px;padding:0 20px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.kicker{font-size:10px;color:var(--blue);font-weight:900;letter-spacing:.14em;text-transform:uppercase}.section-head h2{font-size:21px;margin:2px 0 0;letter-spacing:-.4px}.mode-switch{display:flex;gap:6px;background:#e9eff8;border-radius:12px;padding:4px}.mode-switch button{border:0;background:transparent;padding:8px 12px;border-radius:9px;font-size:11px;font-weight:850;color:#50617c}.mode-switch button.active{background:#fff;color:var(--blue);box-shadow:0 2px 8px #162b4b12}
+.layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(255px,.75fr);gap:15px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px}.play-card{padding:22px}.play-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.play-top small{display:block;font-size:10px;color:var(--muted);font-weight:850;letter-spacing:.1em;text-transform:uppercase}.play-top strong{font-size:18px}.tag{background:#edf3fc;border-radius:20px;padding:5px 9px;color:#285796;font-size:10px;font-weight:900;letter-spacing:.07em}
+.stats{display:flex;gap:7px;margin:17px 0}.stat{flex:1;border:1px solid var(--line);border-radius:11px;padding:7px 10px;text-align:center}.stat small{display:block;font-size:9px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.08em}.stat b{font-size:16px}
+.word-pair{display:grid;grid-template-columns:1fr 48px 1fr;align-items:center;gap:8px;margin:17px 0 14px}.word-box{border-radius:14px;text-align:center;padding:13px 10px;border:1px solid #d7e3f5;background:#f7faff}.word-box small{display:block;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.12em}.word-box strong{display:block;font-size:clamp(25px,4vw,34px);line-height:1.2;letter-spacing:.1em;color:#174a9c}.word-box.goal{background:#fff8e6;border-color:#efdfa9}.word-box.goal strong{color:#77590d}.arrow{font-size:25px;text-align:center;color:#94a2b6}
+.instruction{font-size:13px;color:#596981;margin:16px 0 10px}.instruction strong{color:#174a9c}.trail{min-height:44px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0;padding:10px;background:#f7f9fd;border:1px solid var(--line);border-radius:12px}.trail-word{padding:5px 9px;border:1px solid #d8e4f6;border-radius:8px;color:#174a9c;background:white;font-size:12px;font-weight:900;letter-spacing:.06em}.trail-arrow{color:#9aa8ba}.trail-empty{font-size:11px;color:#8b97a9}
+.answer-form{display:flex;gap:9px}.answer-form input{flex:1;min-width:0;min-height:50px;border:1px solid #cfd9e8;border-radius:11px;padding:11px 14px;color:var(--ink);font-size:17px;font-weight:750;text-transform:uppercase}.answer-form input::placeholder{color:#9aa5b5;font-weight:500;text-transform:none}.answer-form input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #78a4ff;outline-offset:2px}
+button{border:0;border-radius:10px;padding:10px 14px;font-weight:850;transition:transform .12s,background .15s}button:hover:not(:disabled){transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:var(--blue);color:white;box-shadow:0 5px 12px #2867ef28}.primary:hover:not(:disabled){background:var(--blue-dark)}.secondary{background:#edf3fc;color:#23436e}.utility{display:flex;gap:8px;margin-top:9px}.utility button{flex:1;font-size:11px}.feedback{min-height:22px;margin-top:9px;font-size:12px;font-weight:800;color:var(--muted)}.feedback.good{color:var(--green)}.feedback.bad{color:var(--red)}
+.completion{display:none;margin-top:11px;padding:13px;border:1px solid #c8e4d1;background:#eff9f2;border-radius:12px}.completion strong{display:block;color:var(--green);font-size:14px}.completion span{font-size:12px;color:#557261}
+.aside{display:grid;gap:12px;align-content:start}.aside .card{padding:18px}.aside h3{margin:0 0 6px;font-size:16px}.muted{margin:0;color:var(--muted);font-size:12px}.rule-list{display:grid;gap:10px;margin:13px 0 0;padding:0;list-style:none}.rule-list li{display:flex;gap:9px;font-size:12px;color:#56657d}.rule-list b{color:var(--blue)}
+.level-map{margin-top:15px}.map-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.map-head h3{margin:0;font-size:15px}.levels{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;margin-top:12px}.level-btn{min-width:0;padding:8px 0;border:1px solid #dce5f1;background:#f8fafd;color:#536078;font-size:11px}.level-btn.unlocked{background:#eaf1ff;border-color:#cedcf7;color:#174a9c}.level-btn.current{background:var(--blue);border-color:var(--blue);color:white}.level-btn.done{background:#eaf7ef;border-color:#c6e5d0;color:var(--green)}.level-btn:disabled{opacity:.4}
+.daily-note{margin-top:9px;font-size:11px;color:var(--muted)}footer{border-top:1px solid var(--line);background:white;color:#7a879b;font-size:11px;padding:16px 0}
+@media(max-width:850px){.layout{grid-template-columns:1fr}}@media(max-width:600px){.wrap,main{padding-left:14px;padding-right:14px}.bar{padding:10px 0}.logo{font-size:21px}nav{gap:6px 11px}nav a{font-size:10px}.hero{padding:30px 0}.hero-mark{width:58px;height:58px;border-radius:18px;font-size:23px}.card{padding:16px}.play-card{padding:16px}.section-head{align-items:flex-start;flex-direction:column}.mode-switch{width:100%}.mode-switch button{flex:1}.answer-form{flex-direction:column}.answer-form button{width:100%}.levels{grid-template-columns:repeat(4,minmax(0,1fr))}.word-pair{grid-template-columns:1fr 32px 1fr;gap:5px}.word-box{padding:11px 6px}}
+</style>
+</head>
+<body>
+<header><div class="wrap bar"><a href="/" class="logo">Blay<span>Bridge</span></a><nav aria-label="Main navigation">
+<a href="/">Home</a><a href="/?category=Entertainment">Entertainment</a><a href="/?category=Football">Football</a><a href="/?category=Stories">Stories</a><a href="/?category=Technology">Technology</a><a href="/?category=Science">Science</a><a href="/?category=Intelligent%20Insights">Insights</a><a href="/?category=Digital%20Guides">Guides</a><a href="/?category=Latest%20Information">Latest</a><a href="/word-ladder.html" aria-current="page">Word Ladder</a><a href="/about.html">About</a>
+</nav></div></header>
+<section class="hero"><div class="wrap hero-inner"><div><div class="eyebrow">BlayBridge Daily Game</div><h1>Word Ladder</h1><p>Change one letter at a time to bridge the gap between two words. Find a valid path and climb to the next level.</p></div><div class="hero-mark" aria-hidden="true">Aa</div></div></section>
+<main>
+<div class="section-head"><div><div class="kicker" id="modeLabel">Campaign · Level 1</div><h2 id="title">Turn COLD into WARM</h2></div><div class="mode-switch" role="tablist" aria-label="Game mode"><button id="campaignTab" class="active" type="button" role="tab" aria-selected="true">CAMPAIGN</button><button id="dailyTab" type="button" role="tab" aria-selected="false">DAILY CHALLENGE</button></div></div>
+<div class="layout">
+<section class="card play-card">
+<div class="play-top"><div><small id="puzzleLabel">LEVEL 1 OF 8</small><strong id="puzzleName">Find the ladder</strong></div><span class="tag" id="puzzleTag">WORD LADDER</span></div>
+<div class="stats"><div class="stat"><small>Moves</small><b id="moves">0</b></div><div class="stat"><small>Par</small><b id="par">4</b></div><div class="stat"><small>Best</small><b id="best">—</b></div></div>
+<div class="word-pair"><div class="word-box"><small>START</small><strong id="startWord">COLD</strong></div><div class="arrow">→</div><div class="word-box goal"><small>GOAL</small><strong id="goalWord">WARM</strong></div></div>
+<p class="instruction">Change exactly one letter from <strong id="currentWord">COLD</strong> to make a new word.</p>
+<div class="trail" id="trail" aria-label="Your word path"></div>
+<form class="answer-form" id="answerForm"><input id="answerInput" type="text" maxlength="8" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Type your next word" aria-label="Type the next word"><button class="primary" id="submitButton" type="submit">SUBMIT WORD</button></form>
+<div class="utility"><button class="secondary" id="undoButton" type="button">UNDO STEP</button><button class="secondary" id="restartButton" type="button">RESTART LADDER</button></div>
+<div class="feedback" id="feedback" aria-live="polite">Every step must be a real word. See how few moves you can use.</div>
+<div class="completion" id="completion"><strong>Ladder complete!</strong><span id="completionText"></span></div>
+</section>
+<aside class="aside">
+<article class="card"><div class="kicker">How to play</div><h3>Build a bridge, one letter at a time</h3><ul class="rule-list"><li><b>1</b><span>Change one letter in the current word.</span></li><li><b>2</b><span>Make sure the new word is valid.</span></li><li><b>3</b><span>Reach the goal in as few moves as you can.</span></li></ul></article>
+<article class="card"><div class="map-head"><h3 id="progressTitle">Campaign progress</h3><span class="tag" id="progressValue">0 / 8</span></div><p class="muted" id="progressHint" style="margin-top:7px">Finish a ladder to unlock the next one. Progress is saved on this device.</p><div class="levels" id="levels"></div><p class="daily-note" id="dailyNote">Daily Challenge is separate from campaign progress and refreshes at midnight.</p></article>
+</aside>
+</div>
+</main>
+<footer><div class="wrap">BlayBridge Word Ladder · Progress is saved on this device.</div></footer>
+<script>
+(function(){
+"use strict";
+var CAMPAIGN=[
+ {route:["COLD","CORD","CARD","WARD","WARM"]},
+ {route:["CAT","COT","DOT","DOG"]},
+ {route:["HEAD","HEAL","TEAL","TELL","TALL","TAIL"]},
+ {route:["FIVE","FINE","LINE","NINE"]},
+ {route:["GOOD","GOLD","GOLF","WOLF"]},
+ {route:["HARD","HARE","CARE","CASE","EASE","EASY"]},
+ {route:["WORK","WORM","WORD"]},
+ {route:["RICE","RACE","LACE","LATE","MATE","MATH"]}
+];
+var DAILY=[
+ {route:["NICE","MICE","MILE","MILD"]},
+ {route:["TUNE","TUBE","CUBE","CURE"]},
+ {route:["WINE","WIDE","RIDE","RISE"]},
+ {route:["TURN","BURN","BARN","BARK"]},
+ {route:["BOLD","BOND","BEND"]}
+];
+var $=function(id){return document.getElementById(id)};
+var WORDS=new Set();CAMPAIGN.concat(DAILY).forEach(function(p){p.route.forEach(function(w){WORDS.add(w)})});
+var KEY="blaybridge-word-ladder-v1",today=new Date(),dayKey=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+var save={unlocked:1,done:{},best:{},dailyDone:""};
+try{var stored=JSON.parse(localStorage.getItem(KEY)||"{}");save.unlocked=Math.max(1,Math.min(CAMPAIGN.length,Number(stored.unlocked)||1));save.done=stored.done||{};save.best=stored.best||{};save.dailyDone=stored.dailyDone||""}catch(e){}
+var mode="campaign",level=1,puzzle=CAMPAIGN[0],path=[];
+function writeSave(){try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}}
+function dayNumber(){var start=new Date(today.getFullYear(),0,0);return Math.floor((today-start)/86400000)}
+function diffOne(a,b){if(a.length!==b.length)return false;var d=0;for(var i=0;i<a.length;i++)if(a[i]!==b[i]&&++d>1)return false;return d===1}
+function canReach(from,to,steps,used){if(from===to)return true;if(steps<=0)return false;for(var w of WORDS){if(!used.has(w)&&diffOne(from,w)){used.add(w);if(canReach(w,to,steps-1,used))return true;used.delete(w)}}return false}
+function dailyPuzzle(){return DAILY[dayNumber()%DAILY.length]}
+function activePuzzle(){return mode==="daily"?dailyPuzzle():CAMPAIGN[level-1]}
+function renderMap(){
+ $("levels").innerHTML="";
+ CAMPAIGN.forEach(function(_,i){var n=i+1,b=document.createElement("button");b.type="button";b.className="level-btn";b.textContent=n;b.disabled=n>save.unlocked;b.setAttribute("aria-label","Campaign level "+n+(n>save.unlocked?", locked":""));if(n<=save.unlocked)b.classList.add("unlocked");if(n===level&&mode==="campaign")b.classList.add("current");if(save.done[n])b.classList.add("done");b.addEventListener("click",function(){mode="campaign";level=n;startPuzzle()});$("levels").appendChild(b)});
+ $("progressValue").textContent=Object.keys(save.done).filter(function(k){return save.done[k]}).length+" / "+CAMPAIGN.length;
+}
+function paintTrail(){
+ var host=$("trail");host.innerHTML="";path.forEach(function(word,i){if(i){var arrow=document.createElement("span");arrow.className="trail-arrow";arrow.textContent="›";host.appendChild(arrow)}var el=document.createElement("span");el.className="trail-word";el.textContent=word;host.appendChild(el)});
+ if(path.length===1){var note=document.createElement("span");note.className="trail-empty";note.textContent="Your steps will appear here";host.appendChild(note)}
+}
+function startPuzzle(){
+ puzzle=activePuzzle();path=[puzzle.route[0]];$("completion").style.display="none";$("feedback").className="feedback";$("feedback").textContent="Every step must be a real word. See how few moves you can use.";
+ var goal=puzzle.route[puzzle.route.length-1],par=puzzle.route.length-1;
+ $("modeLabel").textContent=mode==="daily"?"Daily Challenge · "+today.toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"}):"Campaign · Level "+level;
+ $("title").textContent="Turn "+puzzle.route[0]+" into "+goal;
+ $("puzzleLabel").textContent=mode==="daily"?"TODAY’S LADDER":"LEVEL "+level+" OF "+CAMPAIGN.length;
+ $("puzzleName").textContent=mode==="daily"?"Daily word ladder":"Find the ladder";
+ $("puzzleTag").textContent=mode==="daily"?"DAILY":"WORD LADDER";
+ $("startWord").textContent=puzzle.route[0];$("goalWord").textContent=goal;$("par").textContent=par;$("moves").textContent="0";
+ var bestKey=mode==="daily"?"daily-"+dayKey:String(level);$("best").textContent=save.best[bestKey]?String(save.best[bestKey]):"—";
+ $("currentWord").textContent=path[0];$("answerInput").value="";$("answerInput").disabled=false;$("submitButton").disabled=false;$("undoButton").disabled=true;
+ $("progressTitle").textContent=mode==="daily"?"Today’s challenge":"Campaign progress";
+ $("progressHint").textContent=mode==="daily"?"Your daily result is separate from campaign progress.":"Finish a ladder to unlock the next one. Progress is saved on this device.";
+ $("dailyNote").textContent=mode==="daily"?(save.dailyDone===dayKey?"Completed today. Come back tomorrow for a fresh ladder.":"This daily puzzle is independent of campaign levels."):"Daily Challenge is separate from campaign progress and refreshes at midnight.";
+ $("campaignTab").classList.toggle("active",mode==="campaign");$("dailyTab").classList.toggle("active",mode==="daily");$("campaignTab").setAttribute("aria-selected",mode==="campaign");$("dailyTab").setAttribute("aria-selected",mode==="daily");
+ renderMap();paintTrail();
+}
+function feedback(message,type){$("feedback").textContent=message;$("feedback").className="feedback"+(type?" "+type:"")}
+function finish(){
+ var key=mode==="daily"?"daily-"+dayKey:String(level),moves=path.length-1;
+ if(!save.best[key]||moves<save.best[key])save.best[key]=moves;
+ if(mode==="campaign"){save.done[level]=true;save.unlocked=Math.max(save.unlocked,Math.min(CAMPAIGN.length,level+1))}
+ else save.dailyDone=dayKey;
+ writeSave();renderMap();$("answerInput").disabled=true;$("submitButton").disabled=true;$("undoButton").disabled=true;
+ $("completionText").textContent="You reached "+puzzle.route[puzzle.route.length-1]+" in "+moves+" "+(moves===1?"move.":"moves.")+(mode==="campaign"&&level<CAMPAIGN.length?" The next level is unlocked.":"");
+ $("completion").style.display="block";feedback("Nice ladder!", "good");
+}
+$("answerForm").addEventListener("submit",function(e){
+ e.preventDefault();var next=$("answerInput").value.trim().toUpperCase(),last=path[path.length-1],goal=puzzle.route[puzzle.route.length-1],limit=puzzle.route.length-1;
+ if(!next){feedback("Type your next word first.","bad");return}
+ if(!/^[A-Z]+$/.test(next)){feedback("Use letters only.","bad");return}
+ if(next.length!==last.length){feedback("Use a word with "+last.length+" letters.","bad");return}
+ if(!WORDS.has(next)){feedback("That word isn’t in this game’s dictionary. Try another.","bad");return}
+ if(path.indexOf(next)>=0){feedback("You already used that word. Try a different step.","bad");return}
+ if(!diffOne(last,next)){feedback("Change exactly one letter from "+last+".","bad");return}
+ var used=new Set(path);used.add(next);
+ if(next!==goal&&!canReach(next,goal,limit-path.length,used)){feedback("That’s a word, but it won’t reach the goal in the remaining moves.","bad");return}
+ path.push(next);$("currentWord").textContent=next;$("moves").textContent=path.length-1;$("undoButton").disabled=false;paintTrail();$("answerInput").value="";
+ if(next===goal){finish();return}
+ feedback("Good step. Keep climbing.","good");$("answerInput").focus();
+});
+$("undoButton").addEventListener("click",function(){if(path.length>1){path.pop();$("currentWord").textContent=path[path.length-1];$("moves").textContent=path.length-1;$("answerInput").value="";$("undoButton").disabled=path.length===1;paintTrail();feedback("Last step removed. Try another route.")}});
+$("restartButton").addEventListener("click",startPuzzle);
+$("campaignTab").addEventListener("click",function(){mode="campaign";level=Math.min(save.unlocked,level);startPuzzle()});
+$("dailyTab").addEventListener("click",function(){mode="daily";startPuzzle()});
+renderMap();startPuzzle();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Play Word Grid, BlayBridge's daily word search and 100-level puzzle game.">
+<title>Word Grid | BlayBridge</title>
+<style>
+:root{--ink:#13233d;--blue:#2867ef;--navy:#101d38;--gold:#e6bb51;--bg:#f5f8fd;--line:#e2eaf5;--green:#20794c;--red:#b6242d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.55 system-ui,Arial,sans-serif;color:var(--ink)}button{font:inherit;cursor:pointer}a{color:inherit;text-decoration:none}
+header{background:white;border-bottom:1px solid var(--line);box-shadow:0 5px 24px #0d23400b}.wrap{max-width:1120px;margin:auto;padding:0 20px}.top{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:20px}.logo{font-size:24px;font-weight:900;letter-spacing:-1.2px}.logo span{color:var(--blue)}nav{display:flex;gap:20px;align-items:center;font-size:13px;font-weight:700}nav a:hover{color:var(--blue)}
+.hero{background:linear-gradient(118deg,#081a37,#174b9b);color:white;padding:27px 0}.hero-row{display:flex;justify-content:space-between;align-items:center;gap:18px}.eyebrow{font-size:10px;letter-spacing:.18em;color:#f2cf75;font-weight:900}.hero h1{font:700 clamp(27px,4vw,40px)/1.15 Georgia,serif;margin:5px 0}.hero p{margin:4px 0 0;color:#d3e3ff;font-size:13px}.daily-badge{border:1px solid #ffffff44;border-radius:12px;padding:9px 12px;font-size:11px;font-weight:850;color:#ffdf8a;white-space:nowrap}
+main{max-width:1050px;margin:25px auto;padding:0 20px}.tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);margin-bottom:18px}.tab{background:transparent;border:0;color:#64738a;padding:10px 14px;font-weight:800;border-bottom:3px solid transparent}.tab.active{color:#174b9b;border-color:var(--blue)}
+.card{background:white;border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 8px 25px #18375a0a}.home-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:15px}.card h2{font:700 20px Georgia,serif;margin:0 0 6px}.muted{color:#697990;font-size:12px;margin:0 0 15px}.continue-card{background:linear-gradient(140deg,#10264d,#174a91);color:white;border:0;padding:22px}.continue-card .muted{color:#d3e3ff}.progress-line{height:8px;background:#ffffff30;border-radius:99px;margin:18px 0 7px;overflow:hidden}.progress-line i{display:block;height:100%;background:linear-gradient(90deg,#f1c75d,#ffe597);border-radius:inherit}.small-row{display:flex;justify-content:space-between;color:#cfddf2;font-size:10px}
+.primary,.secondary{border:0;border-radius:10px;padding:11px 15px;font-weight:850;font-size:12px}.primary{background:#c02732;color:#fff}.primary:hover{background:#a81f29}.secondary{background:#eaf0f8;color:#213451}.gold-btn{background:#e9c765;color:#18243a}.button-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.levels{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;margin-top:10px}.level{border:1px solid #dce3ec;background:#f8fafc;color:#536078;border-radius:8px;padding:7px 0;font-size:10px;font-weight:850}.level.unlocked{background:#edf4ff;border-color:#bfcef0;color:#174b9b}.level.current{background:#174b9b;color:white;border-color:#174b9b}.level.done{background:#e9f7ed;color:#20794c;border-color:#c6e7cf}
+.game-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.game-head h2{margin:0;font:700 22px Georgia,serif}.stats{display:flex;gap:7px}.stat{border:1px solid var(--line);background:#f5f8fc;border-radius:10px;text-align:center;padding:6px 10px;min-width:62px}.stat small{display:block;color:#77849a;font-size:8px;letter-spacing:.1em;font-weight:900;text-transform:uppercase}.stat b{font-size:14px}
+.game-layout{display:grid;grid-template-columns:minmax(260px,1fr) minmax(220px,.8fr);gap:15px}.board-panel{background:#f7f9fc;border:1px solid var(--line);padding:12px;border-radius:15px}.board-title{display:flex;justify-content:space-between;color:#52627a;font-size:10px;font-weight:900;letter-spacing:.1em;margin:1px 2px 10px}.board{display:grid;gap:5px;max-width:500px;margin:auto}.cell{aspect-ratio:1;border:1px solid #d5deea;border-radius:9px;background:white;color:#14233b;font-size:clamp(17px,3.6vw,24px);font-weight:900;box-shadow:0 2px 0 #dce3ec;padding:0}.cell.sel{background:#f3d577;border-color:#d3a72c;transform:scale(.95)}.cell.found{background:#dff2e5;border-color:#b9dec4;color:#267045}.entry{margin-top:10px;padding:9px 10px;background:white;border:1px solid var(--line);border-radius:10px;display:flex;justify-content:space-between;align-items:center}.entry small{font-size:9px;color:#8490a0;font-weight:900;letter-spacing:.1em}.entry strong{letter-spacing:.22em;min-height:22px}
+.clues{display:grid;gap:7px}.clue{display:flex;gap:8px;align-items:center;border:1px solid #e7ebf1;border-radius:9px;padding:8px;background:#fbfcfe;font-size:11px;color:#4c5a70}.clue i{font-style:normal;display:grid;place-items:center;flex:none;width:21px;height:21px;border-radius:7px;background:#edf1f6;font-weight:900;font-size:9px}.clue.done{background:#f0faf3;border-color:#cce7d4;color:#267045}.clue.done i{background:#378653;color:white}
+.game-buttons{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.game-buttons button{flex:1;min-width:90px}.feedback{min-height:22px;margin-top:8px;font-size:11px;font-weight:750;color:#536078}.feedback.good{color:#237644}.feedback.bad{color:#b6242d}.game-aside{display:grid;gap:12px;align-content:start}.aside-note{font-size:10px;color:#768398;line-height:1.5;margin-top:11px}.result{display:none;margin-top:12px;padding:12px;background:#eaf7ee;border:1px solid #c5e5ce;border-radius:11px;color:#23683a;font-weight:800;font-size:12px}.result.show{display:block}.result button{display:block;margin-top:9px}
+.hidden{display:none!important}.footer{color:#7e8ba0;font-size:10px;padding:22px 0 30px;text-align:center}.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,14px);opacity:0;background:#14213a;color:white;padding:10px 14px;border-radius:99px;font-size:11px;font-weight:800;transition:.2s;pointer-events:none;z-index:10}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:700px){.wrap{padding:0 15px}.top{min-height:58px}.logo{font-size:21px}nav{gap:12px;font-size:11px}.hero{padding:22px 0}.hero-row{align-items:flex-start}.hero p{max-width:430px}main{margin:17px auto;padding:0 12px}.home-grid,.game-layout{grid-template-columns:1fr}.levels{grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}.level{font-size:9px;padding:7px 0}.game-head{align-items:flex-start;flex-direction:column}.stats{width:100%}.stat{flex:1}.card{padding:14px}.board-panel{padding:9px}.board{gap:4px}.cell{border-radius:7px}.game-aside{grid-template-columns:1fr}.continue-card{padding:17px}}
+@media(max-width:380px){nav{gap:8px}.hero h1{font-size:25px}.levels{gap:3px}.level{font-size:8px}.stats{gap:4px}.stat{min-width:0;padding:5px 4px}.game-head h2{font-size:19px}}
+</style>
+</head>
+<body>
+<header><div class="wrap top"><a class="logo" href="/">BLAY<span>BRIDGE</span></a><nav aria-label="Main navigation"><a href="/">Home</a><a href="/?category=Football">Football</a><a href="/?category=Technology">Technology</a><a href="/?category=Entertainment">Entertainment</a><a href="/">Latest</a></nav></div></header>
+<section class="hero"><div class="wrap hero-row"><div><div class="eyebrow">BLAYBRIDGE DAILY GAME</div><h1>Word Grid</h1><p>Find hidden words by linking letters across the board. One hundred levels. New daily puzzle.</p></div><div class="daily-badge">♟ &nbsp; 100 LEVEL CAMPAIGN</div></div></section>
+<main>
+<div class="tabs"><button class="tab active" id="campaignTab">Campaign</button><button class="tab" id="dailyTab">Daily puzzle</button></div>
+<section id="homeView">
+  <div class="home-grid">
+    <article class="card continue-card"><div class="eyebrow">YOUR CAMPAIGN</div><h2 id="campaignTitle" style="font:700 24px Georgia,serif;margin:8px 0 4px">Level 1 is ready</h2><p class="muted" id="campaignSub">Start the first puzzle and unlock the next level.</p><div class="progress-line"><i id="campaignProgress"></i></div><div class="small-row"><span id="completedText">0 of 100 levels completed</span><span id="percentText">0%</span></div><div class="button-row"><button class="primary gold-btn" id="continueBtn">PLAY LEVEL 1</button><button class="secondary" id="levelsBtn">LEVEL MAP</button></div></article>
+    <article class="card"><div class="eyebrow" style="color:#b48a22">TODAY’S PUZZLE</div><h2 style="margin-top:8px">A fresh grid every day</h2><p class="muted">A separate daily challenge with its own theme and score. Your campaign progress stays saved on this device.</p><div class="button-row"><button class="primary" id="dailyBtn">PLAY TODAY’S PUZZLE</button></div></article>
+  </div>
+  <article class="card hidden" id="levelMap" style="margin-top:15px"><h2>Level map</h2><p class="muted">Complete a level to unlock the next one.</p><div class="levels" id="levels"></div></article>
+</section>
+<section id="gameView" class="hidden">
+  <div class="game-head"><div><div class="eyebrow" id="gameMode">CAMPAIGN • LEVEL 1</div><h2 id="gameTitle">Football</h2></div><div class="stats"><div class="stat"><small>Found</small><b id="foundCount">0/5</b></div><div class="stat"><small>Score</small><b id="score">0</b></div><div class="stat"><small>Time</small><b id="time">03:00</b></div></div></div>
+  <div class="game-layout">
+    <section class="board-panel"><div class="board-title"><span>LETTER GRID</span><span>Tap connected letters</span></div><div id="board" class="board"></div><div class="entry"><small>YOUR WORD</small><strong id="formed"></strong></div><div class="game-buttons"><button class="primary" id="submit">SUBMIT WORD</button><button class="secondary" id="clear">CLEAR PATH</button><button class="secondary" id="hint">HINT</button></div><div class="feedback" id="feedback" aria-live="polite"></div><div class="result" id="result"></div></section>
+    <aside class="game-aside"><article class="card"><h2 id="clueTitle">Find these words</h2><p class="muted">Use the clues to uncover every word.</p><div class="clues" id="clues"></div><div class="aside-note" id="ruleText">Letters can connect horizontally, vertically or diagonally. A tile may be reused for a different word.</div></article><article class="card"><h2>Level progress</h2><p class="muted" id="stageText">Stage 1 • Beginner</p><div class="progress-line" style="background:#edf1f6"><i id="levelProgress" style="background:linear-gradient(90deg,#2867ef,#71a2ff)"></i></div><div class="small-row" style="color:#66758c"><span id="levelProgressText">Level 1 of 100</span><button class="secondary" id="backBtn" style="padding:6px 10px">BACK TO MAP</button></div></article></aside>
+  </div>
+</section>
+</main>
+<div class="footer">BlayBridge Word Grid · Progress is saved on this device</div><div class="toast" id="toast"></div>
+<script>
+(function(){
+"use strict";
+var BANK={
+Football:[
+["goal","The score-changing moment"],["ball","The object players kick"],["team","A squad playing together"],["kick","Strike the ball with your foot"],["cup","A knockout competition or trophy"],["ref","The official in charge of the match"],["match","A game between two sides"],["pass","Move the ball to a teammate"],["shot","An attempt to score"],["pitch","The field where football is played"],["coach","The person who plans training and tactics"],["tackle","A challenge to win the ball"],["keeper","The player guarding the goal"],["striker","A forward whose main job is scoring"],["penalty","A spot kick awarded after a foul"],["corner","A kick from the corner arc"],["league","A season-long competition"],["trophy","A prize lifted by the winners"],["dribble","Move with the ball at your feet"],["header","A way to play the ball with your head"],["winger","An attacker who plays out wide"],["offside","A rule that limits a forward's position"],["captain","The player who leads the team"],["stadium","A large venue for matches"],["forward","An attacking player near the goal"],["defence","The players protecting their goal"],["transfer","A player's move to another club"],["fixture","A scheduled match"],["save","A goalkeeper's stop"],["tie","A match with equal scores"]
+],
+Technology:[
+["app","Software on a phone"],["web","Pages connected through the internet"],["code","Instructions a computer can run"],["data","Information stored or processed"],["pixel","A tiny part of a digital image"],["robot","A machine that can perform tasks"],["screen","The display on a device"],["cloud","Remote computing and storage"],["server","A computer that provides services"],["browser","Software used to visit websites"],["signal","A transmitted message or wave"],["privacy","Control over personal information"],["network","Connected computers or devices"],["password","A secret used to sign in"],["machine","A device built to perform work"],["software","Programs that run on computers"],["keyboard","A set of keys for typing"],["download","Copy a file from the internet"],["algorithm","A set of steps for solving a problem"],["computer","An electronic device that processes data"],["database","An organised collection of information"],["wireless","A connection that uses radio waves"],["satellite","An object orbiting Earth that can relay signals"],["firewall","A barrier that filters network traffic"],["browser","An app for opening websites"],["storage","A place where digital files are kept"],["monitor","A screen used with a computer"],["encrypt","Protect data by changing it into code"],["virtual","Existing through computer systems"],["update","A newer version of an app or system"]
+],
+Science:[
+["atom","A basic unit of ordinary matter"],["cell","The smallest unit of a living organism"],["moon","A natural body that orbits a planet"],["star","A hot ball of gas that gives off light"],["solar","Relating to the sun"],["gene","A unit of inherited information"],["fossil","A preserved trace of ancient life"],["energy","The ability to cause change or do work"],["oxygen","A gas humans need to breathe"],["carbon","An element found in all known life"],["planet","A large world orbiting a star"],["galaxy","A vast group of stars and gas"],["gravity","The force that attracts objects"],["climate","Long-term patterns in weather"],["species","A group of similar living organisms"],["magnetic","Having the power to attract iron"],["molecule","Two or more atoms bonded together"],["tissue","A group of similar cells working together"],["neutron","A particle with no electric charge"],["orbit","The path one object follows around another"],["physics","The study of matter, energy and motion"],["genetics","The study of inherited traits"],["bacteria","Tiny single-celled organisms"],["volcano","An opening where lava can reach the surface"],["telescope","An instrument for viewing distant objects"],["oxygen","A gas that makes up part of the air"],["eclipse","When one space object blocks another"],["cloning","Making a genetic copy of an organism"],["ecosystem","Living things interacting with their environment"],["magnet","An object that attracts certain metals"]
+],
+Entertainment:[
+["film","A story shown through moving images"],["song","Music with words or melody"],["actor","A performer who plays a character"],["stage","A place where performers appear"],["scene","One part of a play or film"],["novel","A long work of fictional prose"],["music","Organised sound with rhythm or melody"],["dance","Movement performed to music"],["camera","A device used to capture images"],["comedy","A performance intended to make people laugh"],["director","The person guiding a film's creative work"],["costume","Clothing worn by a performer"],["theatre","A place for live performances"],["script","The written words for a performance"],["chorus","A repeated section of a song"],["episode","One instalment of a series"],["premiere","The first public showing of a film"],["studio","A place where films or music are made"],["trailer","A short preview of a film or show"],["audience","People watching a performance"],["producer","A person who organises a film or show"],["festival","An event celebrating films or music"],["soundtrack","Music written or selected for a film"],["animation","Moving images created from drawings or models"],["character","A person or figure in a story"],["screenplay","A written script for a film"],["cinema","A venue where films are shown"],["costume","Clothing chosen for a character"],["performer","A person who entertains an audience"],["spotlight","A bright light focused on a performer"]
+],
+World:[
+["map","A drawing that shows places"],["city","A large and busy settlement"],["river","A natural stream of flowing water"],["coast","The land beside the sea"],["island","Land completely surrounded by water"],["forest","A large area covered by trees"],["desert","A dry region with little rainfall"],["market","A place where goods are bought and sold"],["village","A small community in the countryside"],["nation","A country and its people"],["border","A line separating places or countries"],["ocean","A very large body of salt water"],["culture","Shared customs, arts and ways of life"],["history","The study of events from the past"],["trade","The exchange of goods and services"],["money","Something used to pay for goods"],["language","A system people use to communicate"],["capital","A city where a country's government sits"],["harbour","A sheltered place where ships can dock"],["continent","One of Earth's major land areas"],["currency","The money used in a country"],["journey","Travel from one place to another"],["rainforest","A dense forest with heavy rainfall"],["mountain","A high natural rise of land"],["community","People living or working together"],["population","The people living in a particular place"],["landmark","A feature that helps identify a location"],["equator","An imaginary line around Earth's middle"],["migration","Movement from one region to another"],["territory","An area of land under a group's control"]
+]};
+var THEMES=Object.keys(BANK);
+var configs=[
+{from:3,to:4,size:5,count:5,time:210,label:"Beginner"},
+{from:4,to:5,size:5,count:5,time:195,label:"Easy"},
+{from:4,to:5,size:6,count:6,time:180,label:"Medium"},
+{from:5,to:6,size:7,count:6,time:165,label:"Hard"},
+{from:5,to:7,size:7,count:7,time:150,label:"Expert"}
+];
+var KEY="bbWordGridProgressV1",save={unlocked:1,done:{},daily:{}};
+try{var saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved&&saved.done)save=saved}catch(e){}
+var currentMode="campaign",currentLevel=1,puzzle=null,path=[],mistakes=0,score=0,seconds=180,timer=null,finished=false,hints=2,rng=null;
+var $=function(id){return document.getElementById(id)};
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}}
+function randomFor(seed){var x=(seed>>>0)||1;return function(){x=(x*1664525+1013904223)>>>0;return x/4294967296}}
+function shuffle(a,rand){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(rand()*(i+1));var t=b[i];b[i]=b[j];b[j]=t}return b}
+function stage(level){return Math.min(4,Math.floor((level-1)/20))}
+function daySeed(){var d=new Date();return Number(d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0"))}
+function pickWords(level,daily){
+ var s=daily?daySeed():level,st=stage(s),cfg=configs[st],theme=THEMES[(daily?Math.floor(daySeed()/7):Math.floor((level-1)/4))%THEMES.length];
+ var rand=randomFor((daily?daySeed():level*2909)+731);rng=rand;
+ var bank=BANK[theme].filter(function(x){return x[0].length>=cfg.from&&x[0].length<=cfg.to});
+ if(bank.length<cfg.count){bank=BANK[theme].filter(function(x){return x[0].length>=cfg.from&&x[0].length<=cfg.size})}
+ if(bank.length<cfg.count){bank=BANK[theme]}
+ return {theme:theme,config:cfg,words:shuffle(bank,rand).slice(0,cfg.count),rand:rand,seed:s};
+}
+function fits(board,index,letter){return !board[index]||board[index]===letter}
+function findPath(board,word,n,rand){
+ var starts=shuffle(Array.from({length:n*n},function(_,i){return i}),rand),budget=5000;
+ function dfs(pos,k,visited,pathNow){
+  if(k===word.length)return pathNow.slice();
+  if(--budget<0)return null;
+  var r=Math.floor(pos/n),c=pos%n,near=[];
+  for(var dr=-1;dr<=1;dr++)for(var dc=-1;dc<=1;dc++){
+   if(!dr&&!dc)continue;var rr=r+dr,cc=c+dc;
+   if(rr<0||rr>=n||cc<0||cc>=n)continue;
+   var q=rr*n+cc;if(visited.has(q)||!fits(board,q,word[k]))continue;near.push(q)
+  }
+  near=shuffle(near,rand);
+  for(var i=0;i<near.length;i++){var q=near[i];visited.add(q);pathNow.push(q);var answer=dfs(q,k+1,visited,pathNow);if(answer)return answer;pathNow.pop();visited.delete(q)}
+  return null
+ }
+ for(var i=0;i<starts.length;i++){var p=starts[i];if(!fits(board,p,word[0]))continue;var visited=new Set([p]);var answer=dfs(p,1,visited,[p]);if(answer)return answer}
+ return null
+}
+function buildPuzzle(level,daily){
+ var picked=pickWords(level,daily),words=picked.words.slice().sort(function(a,b){return b[0].length-a[0].length}),n=picked.config.size,board=[],attempt=0,paths=[];
+ for(attempt=0;attempt<60;attempt++){
+  board=Array(n*n).fill("");paths=[];var good=true;
+  for(var i=0;i<words.length;i++){var p=findPath(board,words[i][0].toUpperCase(),n,picked.rand);if(!p){good=false;break}p.forEach(function(index,k){board[index]=words[i][0][k].toUpperCase()});paths.push(p)}
+  if(good)break
+ }
+ if(attempt===60){
+  board=Array(n*n).fill("");paths=[];
+  words.forEach(function(w,i){var p=[];for(var c=0;c<w[0].length;c++){var q=i*n+c;p.push(q);board[q]=w[0][c].toUpperCase()}paths.push(p)})
+ }
+ var alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+ board=board.map(function(ch){return ch||alphabet[Math.floor(picked.rand()*alphabet.length)]});
+ return {theme:picked.theme,config:picked.config,words:words.map(function(w){return {word:w[0].toUpperCase(),clue:w[1]}}),board:board,size:n,paths:paths};
+}
+function notify(text){var t=$("toast");t.textContent=text;t.classList.add("show");setTimeout(function(){t.classList.remove("show")},1500)}
+function home(){
+ stopTimer();$("homeView").classList.remove("hidden");$("gameView").classList.add("hidden");$("levelMap").classList.add("hidden");
+ $("campaignTab").classList.toggle("active",currentMode==="campaign");$("dailyTab").classList.toggle("active",currentMode==="daily");
+ var count=Object.keys(save.done).length,pct=Math.round(count);
+ $("campaignTitle").textContent="Level "+Math.min(save.unlocked,100)+" is ready";
+ $("campaignSub").textContent=count?"Your progress is saved on this device. Keep going.":"Start the first puzzle and unlock the next level.";
+ $("completedText").textContent=count+" of 100 levels completed";$("percentText").textContent=pct+"%";$("campaignProgress").style.width=pct+"%";
+ $("continueBtn").textContent="PLAY LEVEL "+Math.min(save.unlocked,100);
+ renderLevels();
+}
+function renderLevels(){
+ var box=$("levels");box.innerHTML="";
+ for(var i=1;i<=100;i++){var b=document.createElement("button");b.className="level"+(save.done[i]?" done":"")+(i===save.unlocked?" current":"")+(i<=save.unlocked?" unlocked":"");b.textContent=i;b.disabled=i>save.unlocked;b.title=i>save.unlocked?"Complete earlier levels to unlock":"Play level "+i;b.addEventListener("click",(function(level){return function(){start("campaign",level)}})(i));box.appendChild(b)}
+}
+function renderClues(){
+ var box=$("clues");box.innerHTML="";
+ puzzle.words.forEach(function(item,i){var d=document.createElement("div");d.className="clue"+(item.found?" done":"");d.innerHTML="<i>"+(item.found?"✓":String(i+1))+"</i><span>"+item.clue+"</span>";box.appendChild(d)});
+ $("foundCount").textContent=puzzle.words.filter(function(w){return w.found}).length+"/"+puzzle.words.length;
+}
+function renderBoard(){
+ var board=$("board");board.style.gridTemplateColumns="repeat("+puzzle.size+",minmax(0,1fr))";board.innerHTML="";
+ puzzle.board.forEach(function(letter,index){
+  var b=document.createElement("button");var inPath=path.indexOf(index)>=0,used=false;
+  puzzle.words.forEach(function(w){if(w.found&&w.cells&&w.cells.indexOf(index)>=0)used=true});
+  b.className="cell"+(used?" found":"")+(inPath?" sel":"");b.textContent=letter;b.setAttribute("aria-label","Letter "+letter);
+  b.addEventListener("click",function(){tap(index)});board.appendChild(b)
+ });
+ $("formed").textContent=path.map(function(i){return puzzle.board[i]}).join("");
+}
+function render(){
+ renderBoard();renderClues();$("score").textContent=score;
+ $("submit").disabled=finished||path.length<2;
+ $("hint").disabled=finished||hints<=0||puzzle.words.every(function(w){return w.found});
+ $("levelProgress").style.width=(Object.keys(save.done).length)+"%";
+ $("levelProgressText").textContent=currentMode==="daily"?"Daily puzzle":"Level "+currentLevel+" of 100";
+ $("stageText").textContent=currentMode==="daily"?"Daily challenge • "+puzzle.config.label:"Stage "+(stage(currentLevel)+1)+" • "+puzzle.config.label;
+ $("gameMode").textContent=currentMode==="daily"?"DAILY PUZZLE":"CAMPAIGN • LEVEL "+currentLevel;
+ $("gameTitle").textContent=puzzle.theme;
+ $("clueTitle").textContent=currentMode==="daily"?"Today’s clues":"Find these words";
+}
+function tap(index){
+ if(finished)return;
+ if(path.indexOf(index)>=0){path=path.slice(0,path.indexOf(index));renderBoard();return}
+ if(path.length){var last=path[path.length-1],n=puzzle.size;if(Math.max(Math.abs(Math.floor(last/n)-Math.floor(index/n)),Math.abs(last%n-index%n))!==1){say("Choose a letter touching the last one.",false);return}}
+ path.push(index);renderBoard()
+}
+function say(text,good){var f=$("feedback");f.textContent=text;f.className="feedback"+(good?" good":" bad")}
+function start(mode,level){
+ currentMode=mode;currentLevel=level||1;path=[];mistakes=0;score=0;finished=false;hints=mode==="daily"?1:2;puzzle=buildPuzzle(currentLevel,mode==="daily");seconds=puzzle.config.time;
+ puzzle.words.forEach(function(w){w.found=false;w.cells=[]});
+ $("result").classList.remove("show");$("result").innerHTML="";$("feedback").textContent="";$("time").textContent=clock(seconds);
+ $("homeView").classList.add("hidden");$("gameView").classList.remove("hidden");
+ $("campaignTab").classList.toggle("active",mode==="campaign");$("dailyTab").classList.toggle("active",mode==="daily");
+ render();stopTimer();timer=setInterval(function(){if(finished){stopTimer();return}seconds--; $("time").textContent=clock(seconds);if(seconds<=0)finish(false)},1000)
+}
+function clock(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function stopTimer(){if(timer){clearInterval(timer);timer=null}}
+function submit(){
+ if(finished||path.length<2)return;
+ var word=path.map(function(i){return puzzle.board[i]}).join("");
+ var target=puzzle.words.find(function(w){return w.word===word&&!w.found});
+ if(target){target.found=true;target.cells=path.slice();var points=target.word.length*10+Math.max(0,Math.floor(seconds/10));score+=points;path=[];say(target.word+" found! +"+points+" points.",true);render();if(puzzle.words.every(function(w){return w.found}))finish(true)}
+ else{mistakes++;score=Math.max(0,score-5);path=[];say("That word isn’t in this puzzle. 5 points lost.",false);render()}
+}
+function finish(won){
+ if(finished)return;finished=true;stopTimer();
+ if(won&&currentMode==="campaign"){save.done[currentLevel]=Math.max(save.done[currentLevel]||0,mistakes===0?3:mistakes<3?2:1);save.unlocked=Math.max(save.unlocked,Math.min(100,currentLevel+1));persist()}
+ if(won&&currentMode==="daily"){var today=new Date().toISOString().slice(0,10);save.daily[today]=Math.max(save.daily[today]||0,score);persist()}
+ var result=$("result");result.classList.add("show");
+ if(won){var next=currentMode==="campaign"&&currentLevel<100?'<button class="primary" id="nextLevel">PLAY LEVEL '+(currentLevel+1)+'</button>':'<button class="secondary" id="homeAfter">BACK TO WORD GRID</button>';result.innerHTML="Puzzle complete! Score: "+score+" points. "+(currentMode==="campaign"?"Level "+currentLevel+" cleared.":"Daily challenge completed.")+next}
+ else{result.innerHTML="Time is up. You found "+puzzle.words.filter(function(w){return w.found}).length+" of "+puzzle.words.length+" words. <button class='primary' id='retry'>TRY AGAIN</button>"}
+ render();var nextBtn=$("nextLevel");if(nextBtn)nextBtn.addEventListener("click",function(){start("campaign",currentLevel+1)});var homeBtn=$("homeAfter");if(homeBtn)homeBtn.addEventListener("click",home);var retry=$("retry");if(retry)retry.addEventListener("click",function(){start(currentMode,currentLevel)})
+}
+$("submit").addEventListener("click",submit);
+$("clear").addEventListener("click",function(){path=[];renderBoard();say("Path cleared.",true)});
+$("hint").addEventListener("click",function(){if(hints<=0)return;var w=puzzle.words.find(function(x){return !x.found});if(!w)return;hints--;score=Math.max(0,score-30);say("Hint: "+w.word.length+" letters. "+w.clue+" First letter: "+w.word[0]+".",true);render()});
+$("continueBtn").addEventListener("click",function(){start("campaign",Math.min(save.unlocked,100))});
+$("dailyBtn").addEventListener("click",function(){start("daily",daySeed())});
+$("levelsBtn").addEventListener("click",function(){$("levelMap").classList.toggle("hidden");if(!$("levelMap").classList.contains("hidden"))$("levelMap").scrollIntoView({behavior:"smooth",block:"nearest"})});
+$("campaignTab").addEventListener("click",function(){currentMode="campaign";home()});
+$("dailyTab").addEventListener("click",function(){currentMode="daily";home()});
+$("backBtn").addEventListener("click",home);
+home();
+})();
+</script>
+</body>
+</html>

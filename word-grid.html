@@ -90,9 +90,11 @@ function puzzleCount(level){return configs[stage(level)].count}
 function pickWords(level,daily){
  var s=daily?daySeed():level,st=daily?0:stage(level),cfg=configs[st];
  var rand=randomFor((daily?daySeed():level*2909)+731+puzzleIndex*7919);rng=rand;
- var dailyChoices=WORD_ITEMS.map(function(item){return item.word.toLowerCase()}).filter(function(word){return PUZZLE_WORDS.indexOf(word)<0});
- var target=daily?(dailyChoices[daySeed()%Math.max(1,dailyChoices.length)]||"challenge"):LEVEL_PUZZLES[level][puzzleIndex];
- return {theme:daily?"Daily Word Hunt":"Level "+level,config:cfg,words:[[target,"Find the target word in the letter grid"]],rand:rand,seed:s};
+ var dailyChoices=WORD_ITEMS.filter(function(item){return PUZZLE_WORDS.indexOf(item.word.toLowerCase())<0});
+ var dailyItem=dailyChoices[daySeed()%Math.max(1,dailyChoices.length)]||{word:"CHALLENGE",clue:"A difficult task that tests your skill"};
+ var target=daily?dailyItem.word.toLowerCase():LEVEL_PUZZLES[level][puzzleIndex];
+ var clue=daily?dailyItem.clue:"Find this word in the letter grid.";
+ return {theme:daily?"Daily Word Hunt":"Level "+level,config:cfg,words:[[target,clue]],rand:rand,seed:s};
 }
 function fits(board,index,letter){return !board[index]||board[index]===letter}
 function findPath(board,word,n,rand){
@@ -145,8 +147,16 @@ function renderLevels(){
 }
 function renderClues(){
  var box=$("clues");box.innerHTML="";
- var target=puzzle.words[0].word;
- box.innerHTML='<div class="target-word">'+target+'</div><div class="clue"><i>↗</i><span>Find this word in the letter grid.</span></div>';
+ var target=puzzle.words[0];
+ if(currentMode==="daily"){
+  var heading=document.createElement("div");heading.className="target-word";heading.textContent="Question";
+  var clue=document.createElement("div");clue.className="clue";
+  var icon=document.createElement("i");icon.textContent="?";
+  var text=document.createElement("span");text.textContent=target.clue;
+  clue.appendChild(icon);clue.appendChild(text);box.appendChild(heading);box.appendChild(clue);
+ }else{
+  box.innerHTML='<div class="target-word">'+target.word+'</div><div class="clue"><i>↗</i><span>Find this word in the letter grid.</span></div>';
+ }
  $("foundCount").textContent=currentMode==="daily"?(puzzleIndex?"1/1":"0/1"):puzzleIndex+"/"+puzzlesThisLevel;
 }
 function renderBoard(){

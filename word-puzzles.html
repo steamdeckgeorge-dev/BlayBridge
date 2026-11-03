@@ -278,7 +278,7 @@ function startRun(limit){
 }
 function renderQuestion(){
  var q=questions[questionIndex];if(!q)return;
- tileSelections=[];$("promptText").textContent=q.prompt;$("questionType").textContent=q.type;
+ tileSelections=[];if(q.type==="LETTER PUZZLE"&&document.activeElement===$("answerInput"))$("answerInput").blur();$("promptText").textContent=q.prompt;$("questionType").textContent=q.type;
  var tileHost=$("letterTiles"),clearLetters=$("clearLetters");tileHost.innerHTML="";
  if(q.type==="LETTER PUZZLE"){tileHost.classList.remove("hidden");clearLetters.classList.remove("hidden");q.letters.replace(/\s/g,"").split("").forEach(function(letter,index){var tile=document.createElement("button");tile.type="button";tile.className="letter-tile";tile.textContent=letter.toUpperCase();tile.setAttribute("aria-label","Add letter "+letter.toUpperCase());tile.addEventListener("click",function(){if(tile.disabled||finished)return;tile.disabled=true;tileSelections.push({index:index,letter:letter});$("answerInput").value=tileSelections.map(function(item){return item.letter}).join("")});tileHost.appendChild(tile)})}else{tileHost.classList.add("hidden");clearLetters.classList.add("hidden")}
  clearLetters.disabled=false;

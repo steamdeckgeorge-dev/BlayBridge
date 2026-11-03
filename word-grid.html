@@ -25,7 +25,7 @@ main{max-width:1050px;margin:25px auto;padding:0 20px}.tabs{display:flex;gap:8px
 </head>
 <body>
 <header><div class="wrap top"><a class="logo" href="/">BLAY<span>BRIDGE</span></a><nav aria-label="Main navigation"><a href="/">Home</a><a href="/?category=Football">Football</a><a href="/?category=Technology">Technology</a><a href="/?category=Entertainment">Entertainment</a><a href="/">Latest</a></nav></div></header>
-<section class="hero"><div class="wrap hero-row"><div><div class="eyebrow">BLAYBRIDGE DAILY GAME</div><h1>Word Grid</h1><p>Find hidden words by linking letters across the board. One hundred levels. New daily puzzle.</p></div><div class="daily-badge">♟ &nbsp; 100 LEVEL CAMPAIGN</div></div></section>
+<section class="hero"><div class="wrap hero-row"><div><div class="eyebrow">BLAYBRIDGE DAILY GAME</div><h1>Word Grid</h1><p>Solve a different hidden word on every level. One hundred levels. New daily puzzle.</p></div><div class="daily-badge">♟ &nbsp; 100 LEVEL CAMPAIGN</div></div></section>
 <main>
 <div class="tabs"><button class="tab active" id="campaignTab">Campaign</button><button class="tab" id="dailyTab">Daily puzzle</button></div>
 <section id="homeView">
@@ -39,7 +39,7 @@ main{max-width:1050px;margin:25px auto;padding:0 20px}.tabs{display:flex;gap:8px
   <div class="game-head"><div><div class="eyebrow" id="gameMode">CAMPAIGN • LEVEL 1</div><h2 id="gameTitle">Football</h2></div><div class="stats"><div class="stat"><small>Found</small><b id="foundCount">0/5</b></div><div class="stat"><small>Score</small><b id="score">0</b></div><div class="stat"><small>Time</small><b id="time">03:00</b></div></div></div>
   <div class="game-layout">
     <section class="board-panel"><div class="board-title"><span>LETTER GRID</span><span>Tap connected letters</span></div><div id="board" class="board"></div><div class="entry"><small>YOUR WORD</small><strong id="formed"></strong></div><div class="game-buttons"><button class="primary" id="submit">SUBMIT WORD</button><button class="secondary" id="clear">CLEAR PATH</button><button class="secondary" id="hint">HINT</button></div><div class="feedback" id="feedback" aria-live="polite"></div><div class="result" id="result"></div></section>
-    <aside class="game-aside"><article class="card"><h2 id="clueTitle">Find these words</h2><p class="muted">Use the clues to uncover every word.</p><div class="clues" id="clues"></div><div class="aside-note" id="ruleText">Letters can connect horizontally, vertically or diagonally. A tile may be reused for a different word.</div></article><article class="card"><h2>Level progress</h2><p class="muted" id="stageText">Stage 1 • Beginner</p><div class="progress-line" style="background:#edf1f6"><i id="levelProgress" style="background:linear-gradient(90deg,#2867ef,#71a2ff)"></i></div><div class="small-row" style="color:#66758c"><span id="levelProgressText">Level 1 of 100</span><button class="secondary" id="backBtn" style="padding:6px 10px">BACK TO MAP</button></div></article></aside>
+    <aside class="game-aside"><article class="card"><h2 id="clueTitle">Find this word</h2><p class="muted">Follow the clue to find this level’s unique word.</p><div class="clues" id="clues"></div><div class="aside-note" id="ruleText">Letters can connect horizontally, vertically or diagonally. A tile may be reused for a different word.</div></article><article class="card"><h2>Level progress</h2><p class="muted" id="stageText">Stage 1 • Beginner</p><div class="progress-line" style="background:#edf1f6"><i id="levelProgress" style="background:linear-gradient(90deg,#2867ef,#71a2ff)"></i></div><div class="small-row" style="color:#66758c"><span id="levelProgressText">Level 1 of 100</span><button class="secondary" id="backBtn" style="padding:6px 10px">BACK TO MAP</button></div></article></aside>
   </div>
 </section>
 </main>
@@ -65,12 +65,16 @@ World:[
 ]};
 var THEMES=Object.keys(BANK);
 var configs=[
-{from:3,to:4,size:5,count:5,time:210,label:"Beginner"},
-{from:4,to:5,size:5,count:5,time:195,label:"Easy"},
-{from:4,to:5,size:6,count:6,time:180,label:"Medium"},
-{from:5,to:6,size:7,count:6,time:165,label:"Hard"},
-{from:5,to:7,size:7,count:7,time:150,label:"Expert"}
+{from:3,to:4,size:5,time:210,label:"Beginner"},
+{from:4,to:5,size:5,time:195,label:"Easy"},
+{from:5,to:6,size:6,time:180,label:"Medium"},
+{from:6,to:7,size:7,time:165,label:"Hard"},
+{from:7,to:8,size:8,time:150,label:"Expert"}
 ];
+var WORD_ITEMS=[],wordSeen=Object.create(null);
+THEMES.forEach(function(theme){BANK[theme].forEach(function(item){var word=item[0].toUpperCase();if(!wordSeen[word]){wordSeen[word]=true;WORD_ITEMS.push({word:word,clue:item[1],theme:theme})}})});
+function makeCampaignWords(){var used=Object.create(null),assigned=[];for(var level=1;level<=100;level++){var cfg=configs[Math.min(4,Math.floor((level-1)/20))];var options=WORD_ITEMS.filter(function(item){return !used[item.word]&&item.word.length>=cfg.from&&item.word.length<=cfg.to&&item.word.length<=cfg.size});if(!options.length)options=WORD_ITEMS.filter(function(item){return !used[item.word]&&item.word.length>=3&&item.word.length<=cfg.size});var chosen=shuffle(options,randomFor(9143+level*821))[0];if(!chosen)throw new Error("Word Grid needs 100 distinct level words.");used[chosen.word]=true;assigned.push(chosen)}return assigned}
+var CAMPAIGN_WORDS=makeCampaignWords();
 var KEY="bbWordGridProgressV1",save={unlocked:1,done:{},daily:{}};
 try{var saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved&&saved.done)save=saved}catch(e){}
 var currentMode="campaign",currentLevel=1,puzzle=null,path=[],mistakes=0,score=0,seconds=180,timer=null,finished=false,hints=2,rng=null;
@@ -81,12 +85,12 @@ function shuffle(a,rand){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Mat
 function stage(level){return Math.min(4,Math.floor((level-1)/20))}
 function daySeed(){var d=new Date();return Number(d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0"))}
 function pickWords(level,daily){
- var s=daily?daySeed():level,st=stage(s),cfg=configs[st],theme=THEMES[(daily?Math.floor(daySeed()/7):Math.floor((level-1)/4))%THEMES.length];
+ var s=daily?daySeed():level,st=daily?4:stage(level),cfg=configs[st];
  var rand=randomFor((daily?daySeed():level*2909)+731);rng=rand;
- var bank=BANK[theme].filter(function(x){return x[0].length>=cfg.from&&x[0].length<=cfg.to});
- if(bank.length<cfg.count){bank=BANK[theme].filter(function(x){return x[0].length>=cfg.from&&x[0].length<=cfg.size})}
- if(bank.length<cfg.count){bank=BANK[theme]}
- return {theme:theme,config:cfg,words:shuffle(bank,rand).slice(0,cfg.count),rand:rand,seed:s};
+ var selected;
+ if(daily){var candidates=WORD_ITEMS.filter(function(item){return item.word.length<=cfg.size});selected=candidates[daySeed()%candidates.length]}
+ else{selected=CAMPAIGN_WORDS[Math.max(0,Math.min(99,level-1))]}
+ return {theme:selected.theme,config:cfg,words:[[selected.word.toLowerCase(),selected.clue]],rand:rand,seed:s};
 }
 function fits(board,index,letter){return !board[index]||board[index]===letter}
 function findPath(board,word,n,rand){

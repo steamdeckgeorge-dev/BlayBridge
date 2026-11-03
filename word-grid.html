@@ -25,7 +25,7 @@ main{max-width:1050px;margin:25px auto;padding:0 20px}.tabs{display:flex;gap:8px
 </head>
 <body>
 <header><div class="wrap top"><a class="logo" href="/">BLAY<span>BRIDGE</span></a><nav aria-label="Main navigation"><a href="/">Home</a><a href="/?category=Football">Football</a><a href="/?category=Technology">Technology</a><a href="/?category=Entertainment">Entertainment</a><a href="/">Latest</a></nav></div></header>
-<section class="hero"><div class="wrap hero-row"><div><div class="eyebrow">BLAYBRIDGE DAILY GAME</div><h1>Word Grid</h1><p>Solve a different hidden word on every level. One hundred levels. New daily puzzle.</p></div><div class="daily-badge">♟ &nbsp; 100 LEVEL CAMPAIGN</div></div></section>
+<section class="hero"><div class="wrap hero-row"><div><div class="eyebrow">BLAYBRIDGE DAILY GAME</div><h1>Word Grid</h1><p>Complete a timed series of unique word puzzles at every level. Words do not repeat in the campaign.</p></div><div class="daily-badge">♟ &nbsp; 100 LEVEL CAMPAIGN</div></div></section>
 <main>
 <div class="tabs"><button class="tab active" id="campaignTab">Campaign</button><button class="tab" id="dailyTab">Daily puzzle</button></div>
 <section id="homeView">
@@ -36,10 +36,10 @@ main{max-width:1050px;margin:25px auto;padding:0 20px}.tabs{display:flex;gap:8px
   <article class="card hidden" id="levelMap" style="margin-top:15px"><h2>Level map</h2><p class="muted">Complete a level to unlock the next one.</p><div class="levels" id="levels"></div></article>
 </section>
 <section id="gameView" class="hidden">
-  <div class="game-head"><div><div class="eyebrow" id="gameMode">CAMPAIGN • LEVEL 1</div><h2 id="gameTitle">Football</h2></div><div class="stats"><div class="stat"><small>Found</small><b id="foundCount">0/5</b></div><div class="stat"><small>Score</small><b id="score">0</b></div><div class="stat"><small>Time</small><b id="time">03:00</b></div></div></div>
+  <div class="game-head"><div><div class="eyebrow" id="gameMode">CAMPAIGN • LEVEL 1</div><h2 id="gameTitle">Football</h2></div><div class="stats"><div class="stat"><small>Puzzles</small><b id="foundCount">0/5</b></div><div class="stat"><small>Score</small><b id="score">0</b></div><div class="stat"><small>Time</small><b id="time">03:00</b></div></div></div>
   <div class="game-layout">
     <section class="board-panel"><div class="board-title"><span>LETTER GRID</span><span>Tap connected letters</span></div><div id="board" class="board"></div><div class="entry"><small>YOUR WORD</small><strong id="formed"></strong></div><div class="game-buttons"><button class="primary" id="submit">SUBMIT WORD</button><button class="secondary" id="clear">CLEAR PATH</button><button class="secondary" id="hint">HINT</button></div><div class="feedback" id="feedback" aria-live="polite"></div><div class="result" id="result"></div></section>
-    <aside class="game-aside"><article class="card"><h2 id="clueTitle">Find this word</h2><p class="muted">Follow the clue to find this level’s unique word.</p><div class="clues" id="clues"></div><div class="aside-note" id="ruleText">Letters can connect horizontally, vertically or diagonally. A tile may be reused for a different word.</div></article><article class="card"><h2>Level progress</h2><p class="muted" id="stageText">Stage 1 • Beginner</p><div class="progress-line" style="background:#edf1f6"><i id="levelProgress" style="background:linear-gradient(90deg,#2867ef,#71a2ff)"></i></div><div class="small-row" style="color:#66758c"><span id="levelProgressText">Level 1 of 100</span><button class="secondary" id="backBtn" style="padding:6px 10px">BACK TO MAP</button></div></article></aside>
+    <aside class="game-aside"><article class="card"><h2 id="clueTitle">Find this word</h2><p class="muted">Find each target word in the grid before the level timer runs out.</p><div class="clues" id="clues"></div><div class="aside-note" id="ruleText">Tap adjacent letters, including diagonals, to spell the target. Every puzzle uses a different word.</div></article><article class="card"><h2>Level progress</h2><p class="muted" id="stageText">Stage 1 • Beginner</p><div class="progress-line" style="background:#edf1f6"><i id="levelProgress" style="background:linear-gradient(90deg,#2867ef,#71a2ff)"></i></div><div class="small-row" style="color:#66758c"><span id="levelProgressText">Level 1 of 100</span><button class="secondary" id="backBtn" style="padding:6px 10px">BACK TO MAP</button></div></article></aside>
   </div>
 </section>
 </main>
@@ -86,13 +86,13 @@ function randomFor(seed){var x=(seed>>>0)||1;return function(){x=(x*1664525+1013
 function shuffle(a,rand){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(rand()*(i+1));var t=b[i];b[i]=b[j];b[j]=t}return b}
 function stage(level){return Math.min(4,Math.floor((level-1)/20))}
 function daySeed(){var d=new Date();return Number(d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0"))}
+function puzzleCount(level){return configs[stage(level)].count}
 function pickWords(level,daily){
- var s=daily?daySeed():level,st=daily?4:stage(level),cfg=configs[st];
- var rand=randomFor((daily?daySeed():level*2909)+731);rng=rand;
- var selected;
- if(daily){var candidates=WORD_ITEMS.filter(function(item){return item.word.length<=cfg.size});selected=candidates[daySeed()%candidates.length]}
- else{selected=CAMPAIGN_WORDS[Math.max(0,Math.min(99,level-1))]}
- return {theme:selected.theme,config:cfg,words:[[selected.word.toLowerCase(),selected.clue]],rand:rand,seed:s};
+ var s=daily?daySeed():level,st=daily?0:stage(level),cfg=configs[st];
+ var rand=randomFor((daily?daySeed():level*2909)+731+puzzleIndex*7919);rng=rand;
+ var dailyChoices=WORD_ITEMS.map(function(item){return item.word.toLowerCase()}).filter(function(word){return PUZZLE_WORDS.indexOf(word)<0});
+ var target=daily?(dailyChoices[daySeed()%Math.max(1,dailyChoices.length)]||"challenge"):LEVEL_PUZZLES[level][puzzleIndex];
+ return {theme:daily?"Daily Word Hunt":"Level "+level,config:cfg,words:[[target,"Find the target word in the letter grid"]],rand:rand,seed:s};
 }
 function fits(board,index,letter){return !board[index]||board[index]===letter}
 function findPath(board,word,n,rand){

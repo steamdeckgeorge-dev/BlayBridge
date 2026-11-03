@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Play Word Grid, BlayBridge's daily word search and 100-level puzzle game.">
+<meta name="description" content="Play BlayBridge Word Grid, a daily word question and 100-level puzzle game.">
 <title>Word Grid | BlayBridge</title>
 <style>
 :root{--ink:#13233d;--blue:#2867ef;--navy:#101d38;--gold:#e6bb51;--bg:#f5f8fd;--line:#e2eaf5;--green:#20794c;--red:#b6242d}
@@ -21,6 +21,7 @@ main{max-width:1050px;margin:25px auto;padding:0 20px}.tabs{display:flex;gap:8px
 .hidden{display:none!important}.footer{color:#7e8ba0;font-size:10px;padding:22px 0 30px;text-align:center}.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,14px);opacity:0;background:#14213a;color:white;padding:10px 14px;border-radius:99px;font-size:11px;font-weight:800;transition:.2s;pointer-events:none;z-index:10}.toast.show{opacity:1;transform:translate(-50%,0)}
 @media(max-width:700px){.wrap{padding:0 15px}.top{min-height:58px}.logo{font-size:21px}nav{gap:12px;font-size:11px}.hero{padding:22px 0}.hero-row{align-items:flex-start}.hero p{max-width:430px}main{margin:17px auto;padding:0 12px}.home-grid,.game-layout{grid-template-columns:1fr}.levels{grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}.level{font-size:9px;padding:7px 0}.game-head{align-items:flex-start;flex-direction:column}.stats{width:100%}.stat{flex:1}.card{padding:14px}.board-panel{padding:9px}.board{gap:4px}.cell{border-radius:7px}.game-aside{grid-template-columns:1fr}.continue-card{padding:17px}}
 @media(max-width:380px){nav{gap:8px}.hero h1{font-size:25px}.levels{gap:3px}.level{font-size:8px}.stats{gap:4px}.stat{min-width:0;padding:5px 4px}.game-head h2{font-size:19px}}
+.answer-label{display:block;margin:18px 2px 6px;color:#66758c;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}.answer-input{width:100%;min-height:52px;border:1px solid #cdd8e6;border-radius:12px;background:white;padding:12px 14px;font:700 18px/1.3 system-ui,Arial,sans-serif;color:var(--ink);outline:none}.answer-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2867ef20}.answer-panel{min-height:230px}
 </style>
 </head>
 <body>
@@ -31,15 +32,15 @@ main{max-width:1050px;margin:25px auto;padding:0 20px}.tabs{display:flex;gap:8px
 <section id="homeView">
   <div class="home-grid">
     <article class="card continue-card"><div class="eyebrow">YOUR CAMPAIGN</div><h2 id="campaignTitle" style="font:700 24px Georgia,serif;margin:8px 0 4px">Level 1 is ready</h2><p class="muted" id="campaignSub">Start the first puzzle and unlock the next level.</p><div class="progress-line"><i id="campaignProgress"></i></div><div class="small-row"><span id="completedText">0 of 100 levels completed</span><span id="percentText">0%</span></div><div class="button-row"><button class="primary gold-btn" id="continueBtn">PLAY LEVEL 1</button><button class="secondary" id="levelsBtn">LEVEL MAP</button></div></article>
-    <article class="card"><div class="eyebrow" style="color:#b48a22">TODAY’S PUZZLE</div><h2 style="margin-top:8px">A fresh grid every day</h2><p class="muted">A separate daily challenge with its own theme and score. Your campaign progress stays saved on this device.</p><div class="button-row"><button class="primary" id="dailyBtn">PLAY TODAY’S PUZZLE</button></div></article>
+    <article class="card"><div class="eyebrow" style="color:#b48a22">TODAY’S PUZZLE</div><h2 style="margin-top:8px">A fresh question every day</h2><p class="muted">Solve a new daily word question before the timer runs out. Your campaign progress stays saved on this device.</p><div class="button-row"><button class="primary" id="dailyBtn">PLAY TODAY’S PUZZLE</button></div></article>
   </div>
   <article class="card hidden" id="levelMap" style="margin-top:15px"><h2>Level map</h2><p class="muted">Complete a level to unlock the next one.</p><div class="levels" id="levels"></div></article>
 </section>
 <section id="gameView" class="hidden">
   <div class="game-head"><div><div class="eyebrow" id="gameMode">CAMPAIGN • LEVEL 1</div><h2 id="gameTitle">Football</h2></div><div class="stats"><div class="stat"><small>Puzzles</small><b id="foundCount">0/5</b></div><div class="stat"><small>Score</small><b id="score">0</b></div><div class="stat"><small>Time</small><b id="time">03:00</b></div></div></div>
   <div class="game-layout">
-    <section class="board-panel"><div class="board-title"><span>LETTER GRID</span><span>Tap connected letters</span></div><div id="board" class="board"></div><div class="entry"><small>YOUR WORD</small><strong id="formed"></strong></div><div class="game-buttons"><button class="primary" id="submit">SUBMIT WORD</button><button class="secondary" id="clear">CLEAR PATH</button><button class="secondary" id="hint">HINT</button></div><div class="feedback" id="feedback" aria-live="polite"></div><div class="result" id="result"></div></section>
-    <aside class="game-aside"><article class="card"><h2 id="clueTitle">Find this word</h2><p class="muted">Find each target word in the grid before the level timer runs out.</p><div class="clues" id="clues"></div><div class="aside-note" id="ruleText">Tap adjacent letters, including diagonals, to spell the target. Every puzzle uses a different word.</div></article><article class="card"><h2>Level progress</h2><p class="muted" id="stageText">Stage 1 • Beginner</p><div class="progress-line" style="background:#edf1f6"><i id="levelProgress" style="background:linear-gradient(90deg,#2867ef,#71a2ff)"></i></div><div class="small-row" style="color:#66758c"><span id="levelProgressText">Level 1 of 100</span><button class="secondary" id="backBtn" style="padding:6px 10px">BACK TO MAP</button></div></article></aside>
+    <section class="board-panel answer-panel"><div class="board-title"><span>YOUR ANSWER</span><span>Type it and check</span></div><label class="answer-label" for="answerInput">Your answer</label><input id="answerInput" class="answer-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type your answer"><div class="game-buttons"><button class="primary" id="submit">CHECK ANSWER</button><button class="secondary" id="clear">CLEAR ANSWER</button><button class="secondary" id="hint">HINT</button></div><div class="feedback" id="feedback" aria-live="polite"></div><div class="result" id="result"></div></section>
+    <aside class="game-aside"><article class="card"><h2 id="clueTitle">Puzzle question</h2><p class="muted">Read the question and type your answer. The answer stays hidden until you solve it.</p><div class="clues" id="clues"></div><div class="aside-note" id="ruleText">Rearrange the letters when a question gives you a scrambled word.</div></article><article class="card"><h2>Level progress</h2><p class="muted" id="stageText">Stage 1 • Beginner</p><div class="progress-line" style="background:#edf1f6"><i id="levelProgress" style="background:linear-gradient(90deg,#2867ef,#71a2ff)"></i></div><div class="small-row" style="color:#66758c"><span id="levelProgressText">Level 1 of 100</span><button class="secondary" id="backBtn" style="padding:6px 10px">BACK TO MAP</button></div></article></aside>
   </div>
 </section>
 </main>
@@ -79,7 +80,7 @@ for(var levelNumber=1;levelNumber<=100;levelNumber++){var group=Math.min(4,Math.
 if(wordCursor!==820||new Set(PUZZLE_WORDS).size!==820)throw new Error("Word Grid needs 820 unique puzzle words.");
 var KEY="bbWordGridProgressV1",save={unlocked:1,done:{},daily:{}};
 try{var saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved&&saved.done)save=saved}catch(e){}
-var currentMode="campaign",currentLevel=1,puzzleIndex=0,puzzlesThisLevel=5,puzzle=null,path=[],mistakes=0,score=0,seconds=120,timer=null,finished=false,hints=2,rng=null;
+var currentMode="campaign",currentLevel=1,puzzleIndex=0,puzzlesThisLevel=5,puzzle=null,mistakes=0,score=0,seconds=120,timer=null,finished=false,hints=2,rng=null;
 var $=function(id){return document.getElementById(id)};
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}}
 function randomFor(seed){var x=(seed>>>0)||1;return function(){x=(x*1664525+1013904223)>>>0;return x/4294967296}}
@@ -87,48 +88,27 @@ function shuffle(a,rand){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Mat
 function stage(level){return Math.min(4,Math.floor((level-1)/20))}
 function daySeed(){var d=new Date();return Number(d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0"))}
 function puzzleCount(level){return configs[stage(level)].count}
+function scramble(word,rand){
+ var letters=word.toUpperCase().split(""),original=letters.join("");
+ for(var i=0;i<12&&letters.join("")===original;i++)letters=shuffle(letters,rand);
+ if(letters.join("")===original&&letters.length>1)letters.push(letters.shift());
+ return letters.join(" ");
+}
 function pickWords(level,daily){
  var s=daily?daySeed():level,st=daily?0:stage(level),cfg=configs[st];
  var rand=randomFor((daily?daySeed():level*2909)+731+puzzleIndex*7919);rng=rand;
  var dailyChoices=WORD_ITEMS.filter(function(item){return PUZZLE_WORDS.indexOf(item.word.toLowerCase())<0});
  var dailyItem=dailyChoices[daySeed()%Math.max(1,dailyChoices.length)]||{word:"CHALLENGE",clue:"A difficult task that tests your skill"};
  var target=daily?dailyItem.word.toLowerCase():LEVEL_PUZZLES[level][puzzleIndex];
- var clue=daily?dailyItem.clue:"Find this word in the letter grid.";
- return {theme:daily?"Daily Word Hunt":"Level "+level,config:cfg,words:[[target,clue]],rand:rand,seed:s};
-}
-function fits(board,index,letter){return !board[index]||board[index]===letter}
-function findPath(board,word,n,rand){
- var starts=shuffle(Array.from({length:n*n},function(_,i){return i}),rand),budget=5000;
- function dfs(pos,k,visited,pathNow){
-  if(k===word.length)return pathNow.slice();
-  if(--budget<0)return null;
-  var r=Math.floor(pos/n),c=pos%n,near=[];
-  for(var dr=-1;dr<=1;dr++)for(var dc=-1;dc<=1;dc++){
-   if(!dr&&!dc)continue;var rr=r+dr,cc=c+dc;
-   if(rr<0||rr>=n||cc<0||cc>=n)continue;
-   var q=rr*n+cc;if(visited.has(q)||!fits(board,q,word[k]))continue;near.push(q)
-  }
-  near=shuffle(near,rand);
-  for(var i=0;i<near.length;i++){var q=near[i];visited.add(q);pathNow.push(q);var answer=dfs(q,k+1,visited,pathNow);if(answer)return answer;pathNow.pop();visited.delete(q)}
-  return null
- }
- for(var i=0;i<starts.length;i++){var p=starts[i];if(!fits(board,p,word[0]))continue;var visited=new Set([p]);var answer=dfs(p,1,visited,[p]);if(answer)return answer}
- return null
+ var clueItem=daily?dailyItem:WORD_ITEMS.find(function(item){return item.word.toLowerCase()===target});
+ var question=daily||clueItem
+  ?"What word matches this clue? "+clueItem.clue
+  :"Rearrange these letters to make a word: "+scramble(target,rand);
+ return {theme:daily?"Daily Word Questions":"Level "+level,config:cfg,words:[{word:target.toUpperCase(),question:question}],rand:rand,seed:s};
 }
 function buildPuzzle(level,daily){
- var picked=pickWords(level,daily),words=picked.words.slice().sort(function(a,b){return b[0].length-a[0].length}),n=picked.config.size,board=[],attempt=0,paths=[];
- for(attempt=0;attempt<60;attempt++){
-  board=Array(n*n).fill("");paths=[];var good=true;
-  for(var i=0;i<words.length;i++){var p=findPath(board,words[i][0].toUpperCase(),n,picked.rand);if(!p){good=false;break}p.forEach(function(index,k){board[index]=words[i][0][k].toUpperCase()});paths.push(p)}
-  if(good)break
- }
- if(attempt===60){
-  board=Array(n*n).fill("");paths=[];
-  words.forEach(function(w,i){var p=[];for(var c=0;c<w[0].length;c++){var q=i*n+c;p.push(q);board[q]=w[0][c].toUpperCase()}paths.push(p)})
- }
- var alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
- board=board.map(function(ch){return ch||alphabet[Math.floor(picked.rand()*alphabet.length)]});
- return {theme:picked.theme,config:picked.config,words:words.map(function(w){return {word:w[0].toUpperCase(),clue:w[1]}}),board:board,size:n,paths:paths};
+ var picked=pickWords(level,daily);
+ return {theme:picked.theme,config:picked.config,words:picked.words};
 }
 function notify(text){var t=$("toast");t.textContent=text;t.classList.add("show");setTimeout(function(){t.classList.remove("show")},1500)}
 function home(){
@@ -147,46 +127,27 @@ function renderLevels(){
 }
 function renderClues(){
  var box=$("clues");box.innerHTML="";
- var target=puzzle.words[0];
- if(currentMode==="daily"){
-  var heading=document.createElement("div");heading.className="target-word";heading.textContent="Question";
-  var clue=document.createElement("div");clue.className="clue";
-  var icon=document.createElement("i");icon.textContent="?";
-  var text=document.createElement("span");text.textContent=target.clue;
-  clue.appendChild(icon);clue.appendChild(text);box.appendChild(heading);box.appendChild(clue);
- }else{
-  box.innerHTML='<div class="target-word">'+target.word+'</div><div class="clue"><i>↗</i><span>Find this word in the letter grid.</span></div>';
- }
+ var question=puzzle.words[0].question;
+ var card=document.createElement("div");card.className="clue";
+ var icon=document.createElement("i");icon.textContent="?";
+ var text=document.createElement("span");text.textContent=question;
+ card.appendChild(icon);card.appendChild(text);box.appendChild(card);
  $("foundCount").textContent=currentMode==="daily"?(puzzleIndex?"1/1":"0/1"):puzzleIndex+"/"+puzzlesThisLevel;
 }
-function renderBoard(){
- var board=$("board");board.style.gridTemplateColumns="repeat("+puzzle.size+",minmax(0,1fr))";board.innerHTML="";
- puzzle.board.forEach(function(letter,index){
-  var b=document.createElement("button");var inPath=path.indexOf(index)>=0,used=false,hinted=false;
-  puzzle.words.forEach(function(w){if(w.found&&w.cells&&w.cells.indexOf(index)>=0)used=true;if(!w.found&&w.hintedCells&&w.hintedCells.indexOf(index)>=0)hinted=true});
-  b.className="cell"+(used?" found":"")+(hinted?" hinted":"")+(inPath?" sel":"");b.textContent=letter;b.setAttribute("aria-label","Letter "+letter);
-  b.addEventListener("click",function(){tap(index)});board.appendChild(b)
- });
- $("formed").textContent=path.map(function(i){return puzzle.board[i]}).join("");
-}
 function render(){
- renderBoard();renderClues();$("score").textContent=score;
- $("submit").disabled=finished||path.length<2;
- $("hint").disabled=finished||hints<=0||puzzle.words[0].found;$("hint").textContent="HINT ("+hints+")";
+ renderClues();$("score").textContent=score;
+ $("submit").disabled=finished||!$("answerInput").value.trim();
+ $("hint").disabled=finished||hints<=0;$("hint").textContent="HINT ("+hints+")";
  $("levelProgress").style.width=(Object.keys(save.done).length)+"%";
  $("levelProgressText").textContent=currentMode==="daily"?"Daily puzzle":"Level "+currentLevel+" of 100";
  $("stageText").textContent=currentMode==="daily"?"Daily challenge • "+puzzle.config.label:"Stage "+(stage(currentLevel)+1)+" • "+puzzle.config.label+" • "+puzzlesThisLevel+" puzzles • "+clock(configs[stage(currentLevel)].time)+" total";
- $("gameMode").textContent=currentMode==="daily"?"DAILY PUZZLE":"CAMPAIGN • LEVEL "+currentLevel+" • PUZZLE "+Math.min(puzzleIndex+1,puzzlesThisLevel)+" OF "+puzzlesThisLevel;
- $("gameTitle").textContent=currentMode==="daily"?"Daily Word Hunt":"Level "+currentLevel;
- $("clueTitle").textContent="Target word";
- $("ruleText").textContent="Tap adjacent letters, including diagonals, to spell the target. Each puzzle has a different word.";
+ $("gameMode").textContent=currentMode==="daily"?"DAILY QUESTION":"CAMPAIGN • LEVEL "+currentLevel+" • PUZZLE "+Math.min(puzzleIndex+1,puzzlesThisLevel)+" OF "+puzzlesThisLevel;
+ $("gameTitle").textContent=currentMode==="daily"?"Daily Word Question":"Level "+currentLevel;
+ $("clueTitle").textContent="Puzzle question";
+ $("ruleText").textContent="Type your answer. Rearrange the letters when a question gives you a scrambled word.";
+ $("submit").textContent="CHECK ANSWER";
 }
-function tap(index){
- if(finished)return;
- if(path.indexOf(index)>=0){path=path.slice(0,path.indexOf(index));renderBoard();return}
- if(path.length){var last=path[path.length-1],n=puzzle.size;if(Math.max(Math.abs(Math.floor(last/n)-Math.floor(index/n)),Math.abs(last%n-index%n))!==1){say("Choose a letter touching the last one.",false);return}}
- path.push(index);var formed=path.map(function(i){return puzzle.board[i]}).join("");if(puzzle.words.some(function(w){return !w.found&&w.word===formed}))submit();else renderBoard()
-}
+
 function say(text,good){var f=$("feedback");f.textContent=text;f.className="feedback"+(good?" good":" bad")}
 function start(mode,level){
  currentMode=mode;currentLevel=level||1;puzzleIndex=0;puzzlesThisLevel=mode==="daily"?1:puzzleCount(currentLevel);
@@ -196,23 +157,27 @@ function start(mode,level){
  stopTimer();loadPuzzle();timer=setInterval(function(){if(finished){stopTimer();return}seconds--;$("time").textContent=clock(seconds);if(seconds<=0)finish(false)},1000)
 }
 function loadPuzzle(){
- path=[];hints=2;puzzle=buildPuzzle(currentLevel,currentMode==="daily");
- puzzle.words.forEach(function(w,i){w.found=false;w.cells=[];w.path=puzzle.paths[i];w.hintedCells=[]});
+ hints=2;puzzle=buildPuzzle(currentLevel,currentMode==="daily");
+ puzzle.words.forEach(function(w){w.found=false;w.hintIndex=0});
+ $("answerInput").value="";
  $("result").classList.remove("show");$("result").innerHTML="";$("feedback").textContent="";$("time").textContent=clock(seconds);
- render()
+ render();$("answerInput").focus()
 }
 function clock(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
 function stopTimer(){if(timer){clearInterval(timer);timer=null}}
 function submit(){
- if(finished||path.length<2)return;
- var word=path.map(function(i){return puzzle.board[i]}).join("");
- var target=puzzle.words.find(function(w){return w.word===word&&!w.found});
- if(target){
-  target.found=true;target.cells=path.slice();score+=target.word.length*10+Math.max(0,Math.floor(seconds/5));path=[];
+ if(finished)return;
+ var answer=$("answerInput").value.trim().toUpperCase();
+ if(!answer){say("Type your answer first.",false);return}
+ var target=puzzle.words[0];
+ if(answer===target.word){
+  target.found=true;score+=target.word.length*10+Math.max(0,Math.floor(seconds/5));
   puzzleIndex++;
   if(currentMode==="daily"||puzzleIndex>=puzzlesThisLevel)finish(true);
-  else{loadPuzzle();say("Puzzle "+puzzleIndex+" of "+puzzlesThisLevel+" solved. Next word is ready.",true)}
- }else{mistakes++;score=Math.max(0,score-5);path=[];say("That isn’t the target word. 5 points lost.",false);render()}
+  else{loadPuzzle();say("Correct. Puzzle "+puzzleIndex+" of "+puzzlesThisLevel+" solved.",true)}
+ }else{
+  mistakes++;score=Math.max(0,score-5);$("answerInput").select();say("Not quite. Try another answer. 5 points lost.",false);render()
+ }
 }
 function finish(won){
  if(finished)return;finished=true;stopTimer();
@@ -227,9 +192,15 @@ function finish(won){
  var retry=$("retry");if(retry)retry.addEventListener("click",function(){start(currentMode,currentLevel)})
 }
 $("submit").addEventListener("click",submit);
-$("clear").addEventListener("click",function(){path=[];renderBoard();say("Path cleared.",true)});
-$("hint").addEventListener("click",function(){if(hints<=0||finished)return;var w=puzzle.words[0];var index=w.path[w.hintedCells.length];if(index===undefined)return;hints--;score=Math.max(0,score-10);w.hintedCells.push(index);say("Hint: the next letter is highlighted on the grid.",true);render()});
-document.addEventListener("keydown",function(e){if(e.key==="Enter"&&!$("gameView").classList.contains("hidden")&&!finished){e.preventDefault();submit()}});
+$("answerInput").addEventListener("input",function(){$("submit").disabled=finished||!this.value.trim()});
+$("answerInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();submit()}});
+$("clear").addEventListener("click",function(){$("answerInput").value="";$("answerInput").focus();$("submit").disabled=true;say("Answer cleared.",true)});
+$("hint").addEventListener("click",function(){
+ if(hints<=0||finished)return;
+ var w=puzzle.words[0],count=Math.min(w.word.length,++w.hintIndex);
+ hints--;score=Math.max(0,score-10);say("Hint: the answer starts with "+w.word.slice(0,count)+".",true);render()
+});
+document.addEventListener("keydown",function(e){if(e.key==="Enter"&&!$("gameView").classList.contains("hidden")&&!finished&&document.activeElement!==$("answerInput")){e.preventDefault();submit()}});
 $("continueBtn").addEventListener("click",function(){start("campaign",Math.min(save.unlocked,100))});
 $("dailyBtn").addEventListener("click",function(){start("daily",daySeed())});
 $("levelsBtn").addEventListener("click",function(){$("levelMap").classList.toggle("hidden");if(!$("levelMap").classList.contains("hidden"))$("levelMap").scrollIntoView({behavior:"smooth",block:"nearest"})});

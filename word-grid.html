@@ -197,21 +197,28 @@ function submit(){
  if(finished||path.length<2)return;
  var word=path.map(function(i){return puzzle.board[i]}).join("");
  var target=puzzle.words.find(function(w){return w.word===word&&!w.found});
- if(target){target.found=true;target.cells=path.slice();var points=target.word.length*10+Math.max(0,Math.floor(seconds/10));score+=points;path=[];say(target.word+" found! +"+points+" points.",true);render();if(puzzle.words.every(function(w){return w.found}))finish(true)}
- else{mistakes++;score=Math.max(0,score-5);path=[];say("That word isn’t in this puzzle. 5 points lost.",false);render()}
+ if(target){
+  target.found=true;target.cells=path.slice();score+=target.word.length*10+Math.max(0,Math.floor(seconds/5));path=[];
+  puzzleIndex++;
+  if(currentMode==="daily"||puzzleIndex>=puzzlesThisLevel)finish(true);
+  else{loadPuzzle();say("Puzzle "+puzzleIndex+" of "+puzzlesThisLevel+" solved. Next word is ready.",true)}
+ }else{mistakes++;score=Math.max(0,score-5);path=[];say("That isn’t the target word. 5 points lost.",false);render()}
 }
 function finish(won){
  if(finished)return;finished=true;stopTimer();
  if(won&&currentMode==="campaign"){save.done[currentLevel]=Math.max(save.done[currentLevel]||0,mistakes===0?3:mistakes<3?2:1);save.unlocked=Math.max(save.unlocked,Math.min(100,currentLevel+1));persist()}
  if(won&&currentMode==="daily"){var today=new Date().toISOString().slice(0,10);save.daily[today]=Math.max(save.daily[today]||0,score);persist()}
  var result=$("result");result.classList.add("show");
- if(won){var next=currentMode==="campaign"&&currentLevel<100?'<button class="primary" id="nextLevel">PLAY LEVEL '+(currentLevel+1)+'</button>':'<button class="secondary" id="homeAfter">BACK TO WORD GRID</button>';result.innerHTML="Puzzle complete! Score: "+score+" points. "+(currentMode==="campaign"?"Level "+currentLevel+" cleared.":"Daily challenge completed.")+next}
- else{result.innerHTML="Time is up. You found "+puzzle.words.filter(function(w){return w.found}).length+" of "+puzzle.words.length+" words. <button class='primary' id='retry'>TRY AGAIN</button>"}
- render();var nextBtn=$("nextLevel");if(nextBtn)nextBtn.addEventListener("click",function(){start("campaign",currentLevel+1)});var homeBtn=$("homeAfter");if(homeBtn)homeBtn.addEventListener("click",home);var retry=$("retry");if(retry)retry.addEventListener("click",function(){start(currentMode,currentLevel)})
+ if(won){var next=currentMode==="campaign"&&currentLevel<100?'<button class="primary" id="nextLevel">PLAY LEVEL '+(currentLevel+1)+'</button>':'<button class="secondary" id="homeAfter">BACK TO WORD GRID</button>';result.innerHTML=(currentMode==="campaign"?"Level "+currentLevel+" complete! You solved all "+puzzlesThisLevel+" puzzles.":"Daily puzzle complete!")+" Score: "+score+" points. "+next}
+ else{result.innerHTML="Time is up. You solved "+puzzleIndex+" of "+puzzlesThisLevel+" puzzles. <button class='primary' id='retry'>RESTART LEVEL</button>"}
+ render();
+ var nextBtn=$("nextLevel");if(nextBtn)nextBtn.addEventListener("click",function(){start("campaign",currentLevel+1)});
+ var homeBtn=$("homeAfter");if(homeBtn)homeBtn.addEventListener("click",home);
+ var retry=$("retry");if(retry)retry.addEventListener("click",function(){start(currentMode,currentLevel)})
 }
 $("submit").addEventListener("click",submit);
 $("clear").addEventListener("click",function(){path=[];renderBoard();say("Path cleared.",true)});
-$("hint").addEventListener("click",function(){if(hints<=0||finished)return;var w=puzzle.words.find(function(x){return !x.found});if(!w)return;var index=w.hintedCells.length< w.path.length?w.path[w.hintedCells.length]:null;if(index===null)return;hints--;score=Math.max(0,score-20);w.hintedCells.push(index);say("Hint revealed letter "+w.hintedCells.length+" for: "+w.clue+". The highlighted tile is part of the answer.",true);render()});
+$("hint").addEventListener("click",function(){if(hints<=0||finished)return;var w=puzzle.words[0];var index=w.path[w.hintedCells.length];if(index===undefined)return;hints--;score=Math.max(0,score-10);w.hintedCells.push(index);say("Hint: the next letter is highlighted on the grid.",true);render()});
 document.addEventListener("keydown",function(e){if(e.key==="Enter"&&!$("gameView").classList.contains("hidden")&&!finished){e.preventDefault();submit()}});
 $("continueBtn").addEventListener("click",function(){start("campaign",Math.min(save.unlocked,100))});
 $("dailyBtn").addEventListener("click",function(){start("daily",daySeed())});

@@ -179,12 +179,17 @@ function tap(index){
 }
 function say(text,good){var f=$("feedback");f.textContent=text;f.className="feedback"+(good?" good":" bad")}
 function start(mode,level){
- currentMode=mode;currentLevel=level||1;path=[];mistakes=0;score=0;finished=false;hints=mode==="daily"?1:2;puzzle=buildPuzzle(currentLevel,mode==="daily");seconds=puzzle.config.time;
- puzzle.words.forEach(function(w,i){w.found=false;w.cells=[];w.path=puzzle.paths[i];w.hintedCells=[]});
- $("result").classList.remove("show");$("result").innerHTML="";$("feedback").textContent="";$("time").textContent=clock(seconds);
+ currentMode=mode;currentLevel=level||1;puzzleIndex=0;puzzlesThisLevel=mode==="daily"?1:puzzleCount(currentLevel);
+ mistakes=0;score=0;finished=false;hints=2;seconds=mode==="daily"?120:configs[stage(currentLevel)].time;
  $("homeView").classList.add("hidden");$("gameView").classList.remove("hidden");
  $("campaignTab").classList.toggle("active",mode==="campaign");$("dailyTab").classList.toggle("active",mode==="daily");
- render();stopTimer();timer=setInterval(function(){if(finished){stopTimer();return}seconds--; $("time").textContent=clock(seconds);if(seconds<=0)finish(false)},1000)
+ stopTimer();loadPuzzle();timer=setInterval(function(){if(finished){stopTimer();return}seconds--;$("time").textContent=clock(seconds);if(seconds<=0)finish(false)},1000)
+}
+function loadPuzzle(){
+ path=[];hints=2;puzzle=buildPuzzle(currentLevel,currentMode==="daily");
+ puzzle.words.forEach(function(w,i){w.found=false;w.cells=[];w.path=puzzle.paths[i];w.hintedCells=[]});
+ $("result").classList.remove("show");$("result").innerHTML="";$("feedback").textContent="";$("time").textContent=clock(seconds);
+ render()
 }
 function clock(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
 function stopTimer(){if(timer){clearInterval(timer);timer=null}}

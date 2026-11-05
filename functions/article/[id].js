@@ -35,7 +35,7 @@ export async function onRequest(context){
   }
   // Match the Ronaldo thumbnail fallback used by the public article cards so
   // social crawlers receive an image even when no per-post cover is stored.
-  if(!image&&/cristiano\\s+ronaldo/i.test(String(article.title||""))){
+  if(!image&&/cristiano\s+ronaldo/i.test(String(article.title||""))){
     image=new URL("/images/ronaldo-golden-stadium-lights.webp",request.url).href;
   }
   const title=article.title+" | BlayBridge";

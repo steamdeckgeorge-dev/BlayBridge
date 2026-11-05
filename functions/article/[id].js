@@ -40,13 +40,22 @@ export async function onRequest(context){
   }
   const title=article.title+" | BlayBridge";
   const description=article.excerpt||"Read this story on BlayBridge.";
+  const requestUrl=new URL(request.url);
+  const cardVersion=requestUrl.searchParams.get("xcard");
+  const socialUrl=new URL(url);
+  if(cardVersion)socialUrl.searchParams.set("xcard",cardVersion);
+  if(image&&cardVersion){
+    const imageUrl=new URL(image);
+    imageUrl.searchParams.set("xcard",cardVersion);
+    image=imageUrl.href;
+  }
   const tags=[
     '<link rel="canonical" href="'+esc(url)+'">',
     '<meta property="og:type" content="article">',
     '<meta property="og:site_name" content="BlayBridge">',
     '<meta property="og:title" content="'+esc(title)+'">',
     '<meta property="og:description" content="'+esc(description)+'">',
-    '<meta property="og:url" content="'+esc(url)+'">',
+    '<meta property="og:url" content="'+esc(socialUrl.href)+'">',
     image?'<meta property="og:image" content="'+esc(image)+'">':'',
     image?'<meta property="og:image:secure_url" content="'+esc(image)+'">':'',
     image?'<meta property="og:image:width" content="1200">':'',

@@ -49,7 +49,7 @@ export async function onRequest(context){
     image=imageUrl.href;
   }
   const tags=[
-    '<link rel="canonical" href="'+esc(url)+'">',
+    '<link rel="canonical" href="'+esc(cardVersion?socialUrl.href:url)+'">',
     '<meta property="og:type" content="article">',
     '<meta property="og:site_name" content="BlayBridge">',
     '<meta property="og:title" content="'+esc(title)+'">',

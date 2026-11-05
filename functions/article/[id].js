@@ -33,6 +33,11 @@ export async function onRequest(context){
   }else if(cover&&["image","animation","custom"].includes(cover.type)){
     image=new URL("/api/article-cover/"+encodeURIComponent(id),request.url).href;
   }
+  // Match the Ronaldo thumbnail fallback used by the public article cards so
+  // social crawlers receive an image even when no per-post cover is stored.
+  if(!image&&/cristiano\\s+ronaldo/i.test(String(article.title||""))){
+    image=new URL("/images/ronaldo-golden-stadium-lights.webp",request.url).href;
+  }
   const title=article.title+" | BlayBridge";
   const description=article.excerpt||"Read this story on BlayBridge.";
   const tags=[

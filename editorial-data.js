@@ -523,7 +523,7 @@ export const EDITORIAL_POSTS = [
     "date": "8 November 2026",
     "cover": {
       "type": "image",
-      "url": "/images/manchester-united-relegation-zone-40-years.webp",
+      "url": "/images/manchester-united-relegation-zone-40-years.webp?v=2",
       "alt": "Manchester United players in red shirts walk away across the pitch under stadium floodlights"
     }
   }

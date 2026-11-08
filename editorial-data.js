@@ -1,5 +1,22 @@
 export const EDITORIAL_POSTS = [
   {
+    "id": "9b6ce7a2-b788-4ee3-9c26-20261108b001",
+    "category": "Science",
+    "title": "Why Tesla’s Glass Roof Does Not Charge the Car",
+    "excerpt": "A solar roof could add some energy to a Tesla but its limited area cannot collect enough sunlight to charge a large battery on a practical schedule.",
+    "body": "Tesla could technically integrate solar cells into the roof of a car. But a roof cannot collect enough energy to charge a large battery in a practical amount of time. The challenge is not whether sunlight can produce electricity. It is the small amount of sunlight a car can capture compared with the energy it needs.\n\nSolar cells convert only part of the sunlight that reaches them into electricity. The power they produce depends on sunlight intensity, the area covered by cells and their conversion efficiency. For an ideal estimate we can use strong standard test sunlight of one thousand watts per square metre and assume the cells convert twenty per cent into electricity.\n\nNow imagine a car roof has one and a half square metres of usable solar area. Under those ideal conditions it would produce about three hundred watts at peak. That is the power flowing at a moment when sunlight is strong. The battery needs energy, which builds up when power is supplied over time.\n\nFor a simple comparison imagine a sixty kilowatt hour battery. At three hundred watts it would take about two hundred hours of continuous peak output to supply that much energy. Even if the car received five peak sun hours every day it would take about forty sunny days to collect sixty kilowatt hours. This is a generous illustration rather than a measured Tesla roof output and it leaves out charging losses.\n\nA real car would collect less. The roof may be in shade or pointed away from the strongest sunlight. Clouds and the changing angle of the sun reduce the energy reaching the cells. Solar cells also lose some performance as they heat up. A parked car cannot track the sun like a solar array designed to face it.\n\nTesla could cover more of the vehicle with solar cells but that creates new trade offs. Vehicle surfaces are curved and have limited space. The cells and their wiring would need to handle vibration, impacts, heat and weather. The car would also need power electronics and safety protections. Added equipment and weight would have to be justified by the small amount of extra energy. The US Department of Energy identifies area, curvature, weight, durability, safety and repair access as important challenges for vehicle solar systems.\n\nSolar cells on a car could provide a small top up or help power some accessories. They would not make the roof a practical replacement for charging from a wall connector or another charging source. The physics is straightforward. A small surface collects a small amount of energy while an electric car battery stores a much larger amount.\n\nA home solar array can cover many times the area of a car roof and stay in one place under the sun. A passenger car has a much smaller surface that changes angle and exposure throughout the day. That gap in scale is why putting solar cells on a Tesla could add energy but could not realistically charge the whole battery on a useful schedule.",
+    "source_url": "https://www.energy.gov/cmei/systems/solar-photovoltaic-cell-basics\nhttps://www.energy.gov/cmei/systems/solar-photovoltaic-performance-and-efficiency-basics\nhttps://www.energy.gov/cmei/femp/optimizing-solar-photovoltaic-performance-longevity\nhttps://www.energy.gov/cmei/systems/summary-vehicle-integrated-photovoltaics-request-information",
+    "published_at": "2026-11-08",
+    "created_at": "2026-11-08T12:00:00Z",
+    "updated_at": "2026-11-08T12:00:00Z",
+    "date": "8 November 2026",
+    "cover": {
+      "type": "image",
+      "url": "/images/tesla-solar-roof-physics.webp",
+      "alt": "A dark electric car roof beneath the sun with a subtle solar cell pattern"
+    }
+  },
+  {
     "id": "b1b2db71-44f6-4d1e-8ff5-7ad07f4b3d01",
     "category": "Football",
     "title": "Mourinho Was Right. Manchester United Should Have Listened.",

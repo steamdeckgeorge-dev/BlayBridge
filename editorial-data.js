@@ -509,8 +509,7 @@ export const EDITORIAL_POSTS = [
       "url": "/images/network-market-power.webp",
       "alt": "A digital network map with one dominant golden node and smaller competing nodes"
     }
-  }
-,
+  },
   {
     "id": "ad0c92d1-13fc-4c6d-8e3c-20261108b001",
     "category": "Football",

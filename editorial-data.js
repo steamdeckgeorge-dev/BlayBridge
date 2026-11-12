@@ -540,7 +540,7 @@ export const EDITORIAL_POSTS = [
     "date": "12 November 2026",
     "cover": {
       "type": "image",
-      "url": "/images/michael-carrick-sacked-20261112.jpg",
+      "url": "/images/michael-carrick-sacked-20261112.webp",
       "alt": "A manager stands alone on the touchline in a red-lit football stadium"
     }
   }
